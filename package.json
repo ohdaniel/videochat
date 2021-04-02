@@ -12,8 +12,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "postinstall": "(cd ./app) -and (npm)"
+    "start": "PROD=true node server.js",
+    "postinstall": "cd ./app && npm"
   },
   "author": "",
   "license": "ISC",
