@@ -25,13 +25,6 @@ app.use(express.static(__dirname));
 //     res.render('home.html')
 //     // res.send('hi test')
 // })
-const path = require('path');
-if (process.env.PROD) {
-    app.use(express.static(path.join(__dirname, './app')))
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, './app/home.html'))
-    })
-}
 
 const port = process.env.PORT || 3001
 server.listen(port, () => {
