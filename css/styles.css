@@ -36,7 +36,7 @@ body {
   
   .content-container {
     width: 100%;
-    height: calc(100vh - 89px);
+    height: 100%;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
@@ -97,8 +97,8 @@ body {
   .local-video {
     position: absolute;
     border: 1px solid #cddfe7;
-    bottom: 60px;
-    right: 40px;
+    bottom: 0px;
+    right: 0px;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     width: 300px;
