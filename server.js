@@ -1,3 +1,5 @@
+require("dotenv").config()
+
 const express = require('express')
 const app = express()
 const server = require('http').createServer(app)
@@ -24,7 +26,8 @@ app.use(express.static(__dirname));
 //     // res.send('hi test')
 // })
 
-server.listen(3001, () => {
+const port = process.env.PORT || 3001
+server.listen(port, () => {
     console.log('Server started...')
 })
 
@@ -35,8 +38,6 @@ let activeSockets = []
 io.on('connection', (socket) => {
     var host = 'localhost';
     // var host = '192.168.86.23';
-    var port = server.address().port;
-    // console.log('listening on http://'+host+':'+port+'/');
 
     console.log('Connected on Socket ID: ' + socket.id)
 

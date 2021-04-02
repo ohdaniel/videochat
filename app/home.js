@@ -1,4 +1,5 @@
-const socket = io('http://localhost:3001')
+const socket = io()
+// const socket = io('http://localhost:3001')
 // const socket = io('http://192.168.86.23:3001')
 // const socket = io({
 // 	reconnection: true,             // whether to reconnect automatically
