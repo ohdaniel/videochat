@@ -31,6 +31,12 @@ peerConnection.ontrack = function({ streams: [stream] }) {
     }
 }
 
+socket.on('socketid', data => {
+    console.log('socketid' + data.socketid)
+    const userInfo = document.getElementById('user-info')
+    userInfo.innerHTML = `Hello ${data.socketid}`
+})
+
 socket.on('update-user-list', ({ users }) => {
     console.log('socket.on(updateUserList)')
     updateUserList(users)

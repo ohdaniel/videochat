@@ -49,6 +49,13 @@ io.on('connection', (socket) => {
 
     console.log('connection begin activeSockets:' + activeSockets)
     const existingSocket = activeSockets.find(existingSocket => existingSocket === socket.id)
+    console.log('existingSocket:' + existingSocket)
+    console.log(existingSocket)
+    console.log(!existingSocket)
+
+    socket.emit('socketid', {
+        socketid: socket.id
+    })
 
     if (!existingSocket) {
         activeSockets.push(socket.id)
