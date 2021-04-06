@@ -10,7 +10,7 @@ let isAlreadyCalling = false
 
 //Start video and display on own screen
 navigator.mediaDevices.getUserMedia({
-    video: true, audio: false
+    video: true, audio: true
 }).then(function (stream) {
     const localVideo = document.getElementById('local-video')
     if (localVideo) {
