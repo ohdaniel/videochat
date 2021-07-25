@@ -59,7 +59,8 @@ io.on('connection', (socket) => {
 
     socket.emit('socketid', {
         socketid: socket.id,
-        roomNumber: roomNumber
+        roomNumber: roomNumber,
+        storeViewUserId: storeViewUserId
     })
 
     socket.emit('store-load', {

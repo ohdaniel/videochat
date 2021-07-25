@@ -57,7 +57,7 @@ peerConnection.ontrack = function({ streams: [stream] }) {
 socket.on('socketid', data => {
     console.log(data)
     const userInfo = document.getElementById('user-info')
-    userInfo.innerHTML = `Hello ${data.socketid}`
+    userInfo.innerHTML = `Socket ID: ${data.socketid}, User ID: ${data.storeViewUserId}`
 })
 
 socket.on('update-room-list', ({ sockets, rooms }) => {
