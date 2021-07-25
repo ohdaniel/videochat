@@ -94,13 +94,13 @@ body {
     position: fixed;
     border: 1px solid #cddfe7;
     top: 0px;
-    left: 0px;
     right: 0px;
     bottom: 0px;
+    left: 0px;
     width: 100%;
     height: 100%;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
-    z-index: -1;
+    z-index: -1
   }
   
   .local-video {
@@ -112,5 +112,112 @@ body {
     height: 25%;
     box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
-    z-index: 1;
+    z-index: 1
+  }
+
+  .call-store-view-user-panel {
+    position: fixed;
+    border: 1px solid #cddfe7;
+    background-color: white;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 30px;
+    font-size: 20px;
+    text-align: center;
+    display: inline;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+    z-index: -1
+  }
+
+  .active-room-panel {
+    position: fixed;
+    border: 1px solid #cddfe7;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    font-size: 20px;
+    text-align: center;
+    display: inline;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+    z-index: -1
+  }
+  
+  .panel-room {
+    margin: 10px 0 0 0;
+    padding-left: 30px;
+    font-weight: 500;
+    font-size: 18px;
+    border-bottom: 1px solid #cddfe7;
+    padding-bottom: 10px;
+  }
+  
+  .active-room {
+    padding: 10px 30px;
+    border-bottom: 1px solid #cddfe7;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .active-room:hover {
+    background-color: #e8e9eb;
+    transition: background-color 0.5s ease;
+  }
+  
+  .active-room--selected {
+    background-color: #fff;
+    border-right: 5px solid #65a9e5;
+    font-weight: 500;
+    transition: all 0.5s ease;
+  }
+
+  .big-video {
+    position: fixed;
+    border: 1px solid #cddfe7;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+    z-index: -1
+  }
+
+  .small-video {
+    position: fixed;
+    border: 1px solid #cddfe7;
+    bottom: 0px;
+    right: 0px;
+    width: 25%;
+    height: 25%;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 1
+  }
+
+  .buttons {
+    position: fixed;
+    bottom: 0px;
+    right: 0px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    z-index: 2;
+  }
+
+  .button {
+    border-radius: 8px;
+  }
+  
+  .buttonEnabled {
+    background-color: green;
+  }
+
+  .buttonDisabled {
+    background-color: red;
   }

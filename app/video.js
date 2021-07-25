@@ -1,4 +1,5 @@
-const socket = io()
+const roomNumber = Math.floor((Math.random()*999)+1)
+const socket = io({query: "roomNumber=" + roomNumber})
 // const socket = io('http://localhost:3001')
 // const socket = io('http://192.168.86.23:3001')
 
@@ -10,7 +11,7 @@ let isAlreadyCalling = false
 
 //Start video and display on own screen
 navigator.mediaDevices.getUserMedia({
-    video: true, audio: true
+    video: true, audio: false
 }).then(function (stream) {
     const localVideo = document.getElementById('local-video')
     if (localVideo) {
@@ -32,9 +33,9 @@ peerConnection.ontrack = function({ streams: [stream] }) {
 }
 
 socket.on('socketid', data => {
-    console.log('socketid' + data.socketid)
+    console.log(data)
     const userInfo = document.getElementById('user-info')
-    userInfo.innerHTML = `Hello ${data.socketid}`
+    userInfo.innerHTML = `Hello ${data.socketid}, welcome to room ${data.roomNumber}`
 })
 
 socket.on('update-user-list', ({ users }) => {
@@ -81,6 +82,9 @@ function createUserItemContainer(socketId) {
 function unselectUsersFromList() {
     console.log('unselectUsersFromList')
     const alreadySelectedUser = document.querySelectorAll('.active-user.active-user--selected')
+    console.log(alreadySelectedUser)
+
+    alreadySelectedUser.forEach(selectedUser => selectedUser.setAttribute('class','active-user'))
 }
 
 async function callUser(socketId) {

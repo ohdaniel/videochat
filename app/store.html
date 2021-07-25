@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <meta charset="UTF-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+   <title>Store</title>
+   <link
+     href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700&display=swap"
+     rel="stylesheet"
+   />
+   <link rel="stylesheet" href="./../css/styles.css" />
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+ </head>
+ <body>
+   <div class="container">
+    <video autoplay playsinline class="big-video" id="local-video"></video>
+    <video autoplay playsinline muted class="small-video" id="remote-video"></video>
+    <div class="buttons">
+        <button class="button" id="vidButton">vid</button>
+        <button class="button" id="micButton">mic</button>
+        <button class="button" id="swapButton">swap</button>
+    </div>
+   </div>
+   <h1 class="talk-info" id="store-info"> 
+    Hello
+   </h1>
+   <div class="call-store-view-user-panel" id="call-store-view-user-container">
+    Store View User Id: <input type="text" id="store-view-user-id">
+    <button class="button" id="callStoreViewUserButton">Call</button>
+   </div>
+   <script src="./store.js"></script>
+   <!-- <script type="text/javascript">
+        function swapVideos() {
+            var localClass = document.getElementById('local-video').className;
+            var remoteClass = document.getElementById('remote-video').className;
+            document.getElementById('local-video').className = remoteClass;
+            document.getElementById('remote-video').className = localClass;
+        }
+    </script> -->
+ </body>
+</html>
