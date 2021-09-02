@@ -41,6 +41,77 @@ body {
     justify-content: space-between;
     overflow: hidden;
   }
+
+  .menu {
+    top: 0px;
+    float: right;
+    height: 31px;
+    width: 31px;
+    background-color: rgba(245,245,245, 0.6);
+    transition: all ease-in-out .5s;
+  }
+
+  .menu-button {
+    position: relative;
+    display: flex;
+    float: right;
+    justify-content: center;
+    align-items: center;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    transition: all ease-in-out .5s;
+    border: 3px solid black
+  }
+
+  .menu-button-burger {
+    width: 20px;
+    height: 3px;
+    background: black;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px black;
+    transition: all ease-in-out .5s;
+  }
+
+  .menu-button-burger::before,
+  .menu-button-burger::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 3px;
+    background: black;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px black;
+    transition: all ease-in-out .5s;
+  }
+
+  .menu-button-burger::before {
+    transform: translateY(-7px);
+  }
+
+  .menu-button-burger::after {
+    transform: translateY(7px);
+  }
+
+  /* menue selected animation */
+
+  .menu-button.selected .menu-button-burger {
+    transform: translateX(-21.5px);
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .menu-button.selected .menu-button-burger::before {
+    transform: rotate(45deg) translate(15px, -15px);
+  }
+
+  .menu-button.selected .menu-button-burger::after {
+    transform: rotate(-45deg) translate(15px, 15px);
+  }
+
+  .information {
+    white-space: nowrap;
+  }
   
   .active-users-panel {
     position: fixed;
@@ -87,7 +158,7 @@ body {
   
   .talk-info {
     font-weight: 500;
-    font-size: 7px;
+    font-size: 10px;
   }
   
   .remote-video {
@@ -151,17 +222,31 @@ body {
   .panel-room {
     margin: 10px 0 0 0;
     padding-left: 30px;
-    font-weight: 500;
-    font-size: 18px;
+    font-weight: 800;
+    font-size: 25px;
     border-bottom: 1px solid #cddfe7;
     padding-bottom: 10px;
   }
   
   .active-room {
     padding: 10px 30px;
+    font-size: 18px;
     border-bottom: 1px solid #cddfe7;
     cursor: pointer;
     user-select: none;
+  }
+
+  .active-room::before {
+    content: '';
+    display: block;
+    height: 5px;
+    width: 0%;
+    background-color: green;
+    transition: all ease-in-out .5s;
+  }
+
+  .active-room:active::before {
+    width: 100%;
   }
   
   .active-room:hover {
@@ -212,6 +297,7 @@ body {
 
   .button {
     border-radius: 8px;
+    background-color: white;
   }
   
   .buttonEnabled {
@@ -220,4 +306,28 @@ body {
 
   .buttonDisabled {
     background-color: red;
+  }
+
+  .material-icons.phone {
+    font-size: 19px;
+    color: green;
+    font-weight: 600;
+  }
+
+  .material-icons.call {
+    font-size: 15px;
+    color: green;
+    font-weight: 600;
+  }
+
+  .material-icons.md-7 {
+    font-size: 10px;
+    color: black;
+    font-weight: 800;
+  }
+
+  .material-icons.md-20 {
+    font-size: 20px;
+    color: black;
+    font-weight: 800;
   }

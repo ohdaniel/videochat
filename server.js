@@ -31,8 +31,6 @@ server.listen(port, () => {
     console.log('Server started...')
 })
 
-// console.log('__dirname:' + __dirname)
-
 let activeSockets = []
 let socketIdRoomNumberMap = new Map()
 let storeSocketIds = []
@@ -55,9 +53,13 @@ io.on('connection', (socket) => {
         console.log('server.js message')
     })
 
-    const existingSocket = activeSockets.find(existingSocket => existingSocket === socket.id)
-
     socket.emit('socketid', {
+        socketid: socket.id,
+        roomNumber: roomNumber,
+        storeViewUserId: storeViewUserId
+    })
+
+    socket.emit('store-view-load', {
         socketid: socket.id,
         roomNumber: roomNumber,
         storeViewUserId: storeViewUserId
@@ -68,51 +70,17 @@ io.on('connection', (socket) => {
         roomNumber: roomNumber
     })
 
-    if (!existingSocket) {
-        activeSockets.push(socket.id)
-
-        socket.emit('update-user-list', {
-            users: activeSockets.filter(existingSocket => existingSocket !== socket.id)
-        })
-
-        socket.broadcast.emit('update-user-list', {
-            users: [socket.id]
-        })
-    }
-
-    const existingRoom = socketIdRoomNumberMap.has(socket.id)
     var isStore = false
     if (roomNumber) {
         isStore = true
     }
 
-    if (isStore && !existingRoom) {
-        socketIdRoomNumberMap.set(socket.id, roomNumber)
-        storeSocketIds.push(socket.id)
-        storeRoomNumbers.push(roomNumber)
-
-        socket.broadcast.emit('update-room-list', {
-            sockets: storeSocketIds,
-            rooms: storeRoomNumbers
-        })
-    }
-
-    const existingStoreViewUser = socketIdUserIdMap.has(socket.id)
     var isStoreView = false
     if (storeViewUserId) {
         isStoreView = true
     }
 
-    if (isStoreView && !existingStoreViewUser) {
-        socketIdUserIdMap.set(socket.id, storeViewUserId)
-        storeViewSocketIds.push(socket.id)
-        storeViewUserIds.push(storeViewUserId)
-    }
-
-    socket.emit('update-room-list', {
-        sockets: storeSocketIds,
-        rooms: storeRoomNumbers
-    })
+    addToSocketCollections()
 
     socket.on('call-store-view-user-id', data => {
         storeViewUserExists = false
@@ -132,10 +100,18 @@ io.on('connection', (socket) => {
     })
 
     socket.on('call-user', data => {
-        socket.to(data.to).emit('call-made', {
-            offer: data.offer,
-            socket: socket.id
-        })
+        const existingSocket = activeSockets.find(existingSocket => existingSocket === data.to)
+        if (existingSocket) {
+            socket.to(data.to).emit('call-made', {
+                offer: data.offer,
+                socket: socket.id
+            })
+        }
+        else {
+            //TODO: Add pop up if connection doesn't happen
+            //TODO: Call happens twice, so first call connects fine but second fails (since the id gets removed after success)
+            console.log('Socket doesnt exist: ' + data.to)
+        }
     })
 
     socket.on('make-answer', data => {
@@ -145,7 +121,63 @@ io.on('connection', (socket) => {
         })
     })
 
+    socket.on('make-socket-available', () => {
+        addToSocketCollections()
+    })
+
+    socket.on('connection-succeeded', () => {
+        //clear out socketId collections so that socketId can't be called anymore
+        clearOutSocketCollections()
+    })
+
     socket.on('disconnect', () => {
+        //clear out socketId collections so that socketId can't be called anymore
+        clearOutSocketCollections()
+    })
+
+    function addToSocketCollections() {
+        const existingSocket = activeSockets.find(existingSocket => existingSocket === socket.id)
+
+        if (!existingSocket) {
+            activeSockets.push(socket.id)
+
+            socket.emit('update-user-list', {
+                users: activeSockets.filter(existingSocket => existingSocket !== socket.id)
+            })
+
+            socket.broadcast.emit('update-user-list', {
+                users: [socket.id]
+            })
+        }
+
+        const existingRoom = socketIdRoomNumberMap.has(socket.id)
+
+        if (isStore && !existingRoom) {
+            socketIdRoomNumberMap.set(socket.id, roomNumber)
+            storeSocketIds.push(socket.id)
+            storeRoomNumbers.push(roomNumber)
+
+            socket.broadcast.emit('update-room-list', {
+                sockets: storeSocketIds,
+                rooms: storeRoomNumbers
+            })
+        }
+
+        const existingStoreViewUser = socketIdUserIdMap.has(socket.id)
+
+        if (isStoreView && !existingStoreViewUser) {
+            socketIdUserIdMap.set(socket.id, storeViewUserId)
+            storeViewSocketIds.push(socket.id)
+            storeViewUserIds.push(storeViewUserId)
+        }
+
+        socket.emit('update-room-list', {
+            sockets: storeSocketIds,
+            rooms: storeRoomNumbers
+        })
+    }
+
+    function clearOutSocketCollections() {
         activeSockets = activeSockets.filter(existingSocket => existingSocket !== socket.id)
     
         socket.broadcast.emit('remove-user', {
@@ -166,5 +198,5 @@ io.on('connection', (socket) => {
             storeViewSocketIds = storeViewSocketIds.filter(existingStoreViewSocketId => existingStoreViewSocketId !== socket.id)
             storeViewUserIds = storeViewUserIds.filter(existingStoreViewUserId => existingStoreViewUserId !== storeViewUserId)
         }
-    })
+    }
 })

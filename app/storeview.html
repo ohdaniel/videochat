@@ -5,6 +5,7 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
    <title>Store View</title>
+   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
    <link
      href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700&display=swap"
      rel="stylesheet"
@@ -13,20 +14,27 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
  </head>
  <body>
+   <nav class="menu" id="menu">
+     <div class="menu-button">
+       <div class="menu-button-burger"></div>
+     </div>
+     <div class="information" hidden id="information">
+      <h1 class="talk-info" id="user-info"> 
+        <i class="material-icons md-7" id="infoIcon">info_outline</i>
+       </h1>
+     </div>
+   </nav>
    <div class="container">
     <video autoplay playsinline class="big-video" id="remote-video"></video>
     <video autoplay playsinline muted class="small-video" id="local-video"></video>
     <div class="buttons">
-        <button class="button" id="vidButton">vid</button>
-        <button class="button" id="micButton">mic</button>
-        <button class="button" id="swapButton">swap</button>
+        <button class="button" id="vidButton"><i class="material-icons md-20" id="vidIcon"></i></button>
+        <button class="button" id="micButton"><i class="material-icons md-20" id="micIcon"></i></button>
+        <button class="button" id="swapButton"><i class="material-icons md-20" id="swapIcon">autorenew</i></button>
     </div>
    </div>
-   <h1 class="talk-info" id="user-info"> 
-    Hello
-   </h1>
    <div class="active-room-panel" id="active-room-container">
-    <h3 class="panel-room">Active Rooms:</h3>
+    <h3 class="panel-room">Active Rooms</h3>
    </div>
    <script src="./storeview.js"></script>
  </body>
