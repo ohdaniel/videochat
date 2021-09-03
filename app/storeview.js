@@ -60,20 +60,20 @@ navigator.mediaDevices.enumerateDevices()
             var vidIcon = document.getElementById('vidIcon')
             var micIcon = document.getElementById('micIcon')
             if (vidEnabled) {
-                vidButton.className = vidButton.className + ' buttonEnabled'
+                vidButton.classList.replace('buttonDisabled', 'buttonEnabled')
                 vidIcon.innerHTML = 'videocam'
             }
             else {
-                vidButton.className = vidButton.className + ' buttonDisabled'
+                vidButton.classList.replace('buttonEnabled', 'buttonDisabled')
                 vidIcon.innerHTML = 'videocam_off'
             }
             
             if (micEnabled) {
-                micButton.className = micButton.className + ' buttonEnabled'
+                micButton.classList.replace('buttonDisabled', 'buttonEnabled')
                 micIcon.innerHTML = 'mic'
             }
             else {
-                micButton.className = micButton.className + ' buttonDisabled'
+                micButton.classList.replace('buttonEnabled', 'buttonDisabled')
                 micIcon.innerHTML = 'mic_off'
             }
         }).catch(function(error) {
@@ -94,7 +94,9 @@ peerConnection.oniceconnectionstatechange = function() {
 
     if (iceConnectionState == 'connected') {
         //Clean out all possibilities of being connected to anyone else
-        document.title = `Store View Room ${currentRoomNumber}`
+        if (currentRoomNumber) {
+            document.title = `Store View Room ${currentRoomNumber}`
+        }
         document.getElementById('active-room-container').style.display = 'none'
         socket.emit('connection-succeeded', {})
     }
@@ -170,9 +172,9 @@ socket.on('remove-room', ({ roomNumber }) => {
 })
 
 async function callUser(socketId) {
-    const offer = await peerConnection.createOffer()
+    var offerConstraints = { offerToReceiveAudio: true, offerToReceiveVideo: true } //In the event the current screen doesn't have either video or audio, will always accept video and audio from user called
+    const offer = await peerConnection.createOffer(offerConstraints)
     await peerConnection.setLocalDescription(new RTCSessionDescription(offer))
-
     socket.emit('call-user', {
         offer,
         to: socketId
@@ -201,38 +203,40 @@ socket.on('answer-made', async data => {
 
 const vidButton = document.getElementById('vidButton')
 vidButton.addEventListener('click', () => {
-    myStream.getVideoTracks()[0].enabled = !(myStream.getVideoTracks()[0].enabled)
-    
     var vid = myStream.getVideoTracks()[0]
-    var vidEnabled = vid && vid.enabled
-    var vidButton = document.getElementById('vidButton')
-    var vidIcon = document.getElementById('vidIcon')
-    if (vidEnabled) {
-        vidButton.setAttribute('class', 'button buttonEnabled')
-        vidIcon.innerHTML = 'videocam'
-    }
-    else {
-        vidButton.setAttribute('class', 'button buttonDisabled')
-        vidIcon.innerHTML = 'videocam_off'
+
+    if (vid || vid === false) {
+        vid.enabled = !vid.enabled //opposite of what it was before the click
+        var vidEnabled = vid.enabled
+        var vidButton = document.getElementById('vidButton')
+        var vidIcon = document.getElementById('vidIcon')
+        if (vidEnabled) {
+            vidButton.classList.replace('buttonDisabled', 'buttonEnabled')
+            vidIcon.innerHTML = 'videocam'
+        }
+        else {
+            vidButton.classList.replace('buttonEnabled', 'buttonDisabled')
+            vidIcon.innerHTML = 'videocam_off'
+        }
     }
 })
 
 const micButton = document.getElementById('micButton')
 micButton.addEventListener('click', () => {
-    myStream.getAudioTracks()[0].enabled = !(myStream.getAudioTracks()[0].enabled)
-
-
     var mic = myStream.getAudioTracks()[0]
-    var micEnabled = mic && mic.enabled
-    var micButton = document.getElementById('micButton')
-    var micIcon = document.getElementById('micIcon')
-    if (micEnabled) {
-        micButton.setAttribute('class', 'button buttonEnabled')
-        micIcon.innerHTML = 'mic'
-    }
-    else {
-        micButton.setAttribute('class', 'button buttonDisabled')
-        micIcon.innerHTML = 'mic_off'
+    if (mic || mic === false) {
+        mic.enabled = !mic.enabled //opposite of what it was before the click
+        var micEnabled = mic.enabled
+        var micButton = document.getElementById('micButton')
+        var micIcon = document.getElementById('micIcon')
+        if (micEnabled) {
+            micButton.classList.replace('buttonDisabled', 'buttonEnabled')
+            micIcon.innerHTML = 'mic'
+        }
+        else {
+            micButton.classList.replace('buttonEnabled', 'buttonDisabled')
+            micIcon.innerHTML = 'mic_off'
+        }
     }
 })
 
