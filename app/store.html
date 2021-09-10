@@ -19,9 +19,13 @@
        <div class="menu-button-burger"></div>
      </div>
      <div class="information" hidden id="information">
-      <h1 class="talk-info" id="store-info"> 
-        <i class="material-icons md-7" id="infoIcon">info_outline</i>
+       <h1 class="talk-info" id="store-info">
+         <i class="material-icons md-7" id="infoIcon">info_outline</i>
        </h1>
+       <div class="cam-options">
+         Camera: 
+         <select class="custom-select" id="cam-select" onChange="changeCamera(this.value)"></select>
+       </div>
      </div>
    </nav>
    <div class="container">

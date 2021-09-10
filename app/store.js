@@ -30,53 +30,161 @@ menuButton.addEventListener('click', () => {
     }
 })
 
+var cameraMode = 'environment' //Store starts off showing the back of the camera if there is one
+var camsAvailable
+var micsAvailableAvailable
+var mediaConstraints
+var cameraSelected
+
 //Start video and display on own screen
 navigator.mediaDevices.enumerateDevices()
     .then(devices => {
-        const cams = devices.filter(device => device.kind == 'videoinput')
-        const mics = devices.filter(device => device.kind == 'audioinput')
+        camsAvailable = devices.filter(device => device.kind == 'videoinput')
+        micsAvailable = devices.filter(device => device.kind == 'audioinput')
 
-        const mediaConstraints = { video: cams.length > 0, audio: mics.length > 0}
+        //Initially use back camera if available
+        if (camsAvailable.length > 0) {
+            mediaConstraints = {
+                video: {
+                    facingMode: {
+                        exact: cameraMode
+                    }
+                }, audio: micsAvailable.length > 0}
+        }
 
         return navigator.mediaDevices.getUserMedia(mediaConstraints)
     })
-        .then(function (stream) {
-            const localVideo = document.getElementById('local-video')
-            if (localVideo) {
-                localVideo.srcObject = stream
-            }
-            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
-
-            myStream = stream
-
-            var vid = stream.getVideoTracks()[0]
-            var vidEnabled = vid && vid.enabled
-            var mic = stream.getAudioTracks()[0]
-            var micEnabled = mic && mic.enabled
-            var vidButton = document.getElementById('vidButton')
-            var micButton = document.getElementById('micButton')
-            var vidIcon = document.getElementById('vidIcon')
-            var micIcon = document.getElementById('micIcon')
-            if (vidEnabled) {
-                vidButton.classList.replace('buttonDisabled', 'buttonEnabled')
-                vidIcon.innerHTML = 'videocam'
-            }
-            else {
-                vidButton.classList.replace('buttonEnabled', 'buttonDisabled')
-                vidIcon.innerHTML = 'videocam_off'
-            }
-
-            if (micEnabled) {
-                micButton.classList.replace('buttonDisabled', 'buttonEnabled')
-                micIcon.innerHTML = 'mic'
-            }
-            else {
-                micButton.classList.replace('buttonEnabled', 'buttonDisabled')
-                micIcon.innerHTML = 'mic_off'
-            }
+        .then((stream) => {
+            initializeMediaDevices(stream)
         }).catch(function(error) {
             console.warn(error)
+
+            if (error.name === 'OverconstrainedError') {
+                const mediaConstraints = { video: camsAvailable.length > 0, audio: micsAvailable.length > 0}
+                navigator.mediaDevices.getUserMedia(mediaConstraints)
+                    .then((finalStream) => {
+                        initializeMediaDevices(finalStream)
+                    }).catch(function(error) {
+                        console.warn(error)
+                    })
+            }
         })
+
+function initializeMediaDevices(stream) {
+    const localVideo = document.getElementById('local-video')
+    if (localVideo) {
+        localVideo.srcObject = stream
+    }
+    stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
+
+    myStream = stream
+
+    var vid = stream.getVideoTracks()[0]
+    var vidEnabled = vid && vid.enabled
+    var mic = stream.getAudioTracks()[0]
+    var micEnabled = mic && mic.enabled
+    var vidButton = document.getElementById('vidButton')
+    var micButton = document.getElementById('micButton')
+    var vidIcon = document.getElementById('vidIcon')
+    var micIcon = document.getElementById('micIcon')
+    if (vidEnabled) {
+        vidButton.classList.replace('buttonDisabled', 'buttonEnabled')
+        vidIcon.innerHTML = 'videocam'
+    }
+    else {
+        vidButton.classList.replace('buttonEnabled', 'buttonDisabled')
+        vidIcon.innerHTML = 'videocam_off'
+    }
+
+    if (micEnabled) {
+        micButton.classList.replace('buttonDisabled', 'buttonEnabled')
+        micIcon.innerHTML = 'mic'
+    }
+    else {
+        micButton.classList.replace('buttonEnabled', 'buttonDisabled')
+        micIcon.innerHTML = 'mic_off'
+    }
+
+    setupCameraList()
+}
+
+function setupCameraList() {
+    cameraSelected = myStream.getVideoTracks()[0].getSettings().deviceId
+
+    const cameraOptions = document.getElementById('cam-select')
+    var noCameraOption = document.createElement('option')
+    noCameraOption.value = ''
+    noCameraOption.innerHTML = 'No Camera'
+    cameraOptions.appendChild(noCameraOption)
+
+    camsAvailable.forEach(camera => {
+        var camOption = document.createElement('option')
+        camOption.value = camera.deviceId
+        camOption.innerHTML = camera.label
+        if (camera.deviceId === cameraSelected) {
+            camOption.setAttribute('selected', 'selected')
+        }
+        cameraOptions.appendChild(camOption)
+    })
+
+    myStream.getVideoTracks()[0].getSettings().deviceId
+}
+
+function changeCamera(cameraDeviceId) {
+    cameraSelected = cameraDeviceId
+
+    if (cameraSelected === '') {
+        mediaConstraints = { video: false, audio: micsAvailable.length > 0}
+    }
+    else {
+        mediaConstraints = {
+            video: {
+                deviceId: cameraSelected
+            }, audio: micsAvailable.length > 0}
+    }
+
+    navigator.mediaDevices.getUserMedia(mediaConstraints)
+    .then(function (stream) {
+        const localVideo = document.getElementById('local-video')
+        if (localVideo) {
+            localVideo.srcObject = stream
+        }
+        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
+
+        // peerConnection.removeStream(peerConnection.getLocalStreams()[0])
+        // peerConnection.addStream(stream)
+
+        // peerConnection.getSenders().forEach(rtcRtpSender => {
+        //     console.log(rtcRtpSender)
+        //     if (rtcRtpSender.track.kind  == 'video') {
+        //         console.log('video rtcrpSender!')
+        //         console.log(rtcRtpSender)
+        //         rtcRtpSender.replaceTrack(stream.getVideoTracks()[0])
+        //     }
+        // })
+
+        var videoTrack = stream.getVideoTracks()[0]
+        var sender = peerConnection.getSenders().find(function(rtcRtpSender) {
+            return rtcRtpSender.track.kind == 'video' //videoTrack.kind
+        })
+        sender.replaceTrack(videoTrack)
+
+    }).catch(function(error) {
+        console.warn(error)
+    })
+}
+
+//Attempt to get permission to send notifications when someone joins room.
+if (Notification.permission === 'granted') {
+    console.log('Notification permission already granted!')
+}
+else {
+    Notification.requestPermission().then(function(result) {
+        if (result !== 'granted') {
+            alert('Please allow notifications if you want to be alerted when someone joins your room')
+        }
+    })
+}
 
 peerConnection.ontrack = function({ streams: [stream] }) {
     const remoteVideo = document.getElementById('remote-video')
@@ -94,6 +202,14 @@ peerConnection.oniceconnectionstatechange = function() {
         //Clean out all possibilities of being connected to anyone else
         document.getElementById('call-store-view-user-container').style.display = 'none'
         socket.emit('connection-succeeded', {})
+
+        //Notify store that someone connected if tab isn't active
+        if (Notification.permission === 'granted') {
+            console.log(document.hasFocus())
+            if (!document.hasFocus()) {
+                var notification = new Notification('Someone joined your room!')
+            }
+        }
     }
     if (iceConnectionState == 'disconnected') {
         //Clear out traces of old connection and setup screen to be able to connect to someone again
@@ -122,7 +238,8 @@ async function callStoreViewUser(storeViewUserId) {
 }
 
 async function callUser(socketId) {
-    const offer = await peerConnection.createOffer()
+    var offerConstraints = { offerToReceiveAudio: true, offerToReceiveVideo: true } //In the event the current screen doesn't have either video or audio, will always accept video and audio from user called
+    const offer = await peerConnection.createOffer(offerConstraints)
     await peerConnection.setLocalDescription(new RTCSessionDescription(offer))
 
     socket.emit('call-user', {
