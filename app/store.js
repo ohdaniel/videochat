@@ -42,6 +42,8 @@ navigator.mediaDevices.enumerateDevices()
         camsAvailable = devices.filter(device => device.kind == 'videoinput')
         micsAvailable = devices.filter(device => device.kind == 'audioinput')
 
+        console.log(camsAvailable)
+
         //Initially use back camera if available
         if (camsAvailable.length > 0) {
             mediaConstraints = {
@@ -50,6 +52,9 @@ navigator.mediaDevices.enumerateDevices()
                         exact: cameraMode
                     }
                 }, audio: micsAvailable.length > 0}
+        }
+        else {
+            mediaConstraints = { video: false, audio: micsAvailable.length > 0}
         }
 
         return navigator.mediaDevices.getUserMedia(mediaConstraints)
@@ -222,6 +227,7 @@ peerConnection.oniceconnectionstatechange = function() {
 }
 
 socket.on('store-load', data => {
+    console.log('store-load')
     const userInfo = document.getElementById('store-info')
     userInfo.innerHTML = userInfo.innerHTML + `Room Number: ${data.roomNumber}, Socket ID: ${data.socketid}`
 })

@@ -37,7 +37,7 @@ navigator.mediaDevices.enumerateDevices()
         const cams = devices.filter(device => device.kind == 'videoinput')
         const mics = devices.filter(device => device.kind == 'audioinput')
 
-        const mediaConstraints = { video: false, audio: mics.length > 0}
+        const mediaConstraints = { video: cams.length > 0, audio: mics.length > 0}
 
         return navigator.mediaDevices.getUserMedia(mediaConstraints)
     })
