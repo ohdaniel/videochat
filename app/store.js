@@ -34,7 +34,7 @@ var cameraMode = 'environment' //Store starts off showing the back of the camera
 var camsAvailable
 var micsAvailableAvailable
 var mediaConstraints
-var cameraSelected
+var cameraSelected = ''
 
 //Start video and display on own screen
 navigator.mediaDevices.enumerateDevices()
@@ -42,7 +42,9 @@ navigator.mediaDevices.enumerateDevices()
         camsAvailable = devices.filter(device => device.kind == 'videoinput')
         micsAvailable = devices.filter(device => device.kind == 'audioinput')
 
-        console.log(camsAvailable)
+        camsAvailable.forEach(camera => {
+            console.log(camera)
+        })
 
         //Initially use back camera if available
         if (camsAvailable.length > 0) {
@@ -114,7 +116,10 @@ function initializeMediaDevices(stream) {
 }
 
 function setupCameraList() {
-    cameraSelected = myStream.getVideoTracks()[0].getSettings().deviceId
+    if (myStream.getVideoTracks()[0]) {
+        cameraSelected = myStream.getVideoTracks()[0].getSettings().deviceId
+    }
+    console.log('camera selected: ' + cameraSelected)
 
     const cameraOptions = document.getElementById('cam-select')
     var noCameraOption = document.createElement('option')
