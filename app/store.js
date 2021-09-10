@@ -42,6 +42,7 @@ navigator.mediaDevices.enumerateDevices()
         camsAvailable = devices.filter(device => device.kind == 'videoinput')
         micsAvailable = devices.filter(device => device.kind == 'audioinput')
 
+        console.log('total cameras: ' + camsAvailable.length)
         camsAvailable.forEach(camera => {
             console.log(camera)
         })
@@ -112,7 +113,7 @@ function initializeMediaDevices(stream) {
         micIcon.innerHTML = 'mic_off'
     }
 
-    setupCameraList()
+    //setupCameraList()
 }
 
 function setupCameraList() {
@@ -136,8 +137,6 @@ function setupCameraList() {
         }
         cameraOptions.appendChild(camOption)
     })
-
-    myStream.getVideoTracks()[0].getSettings().deviceId
 }
 
 function changeCamera(cameraDeviceId) {
