@@ -36,6 +36,11 @@ var micsAvailableAvailable
 var mediaConstraints
 var cameraSelected = ''
 
+if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices()) {
+    const userInfo = document.getElementById('store-info')
+    userInfo.innerHTML = userInfo.innerHTML + 'This device is not supported'
+}
+
 //Start video and display on own screen
 navigator.mediaDevices.enumerateDevices()
     .then(devices => {
@@ -113,7 +118,7 @@ function initializeMediaDevices(stream) {
         micIcon.innerHTML = 'mic_off'
     }
 
-    //setupCameraList()
+    setupCameraList()
 }
 
 function setupCameraList() {
@@ -184,19 +189,22 @@ function changeCamera(cameraDeviceId) {
 }
 
 console.log("Notification:")
-console.log(Notification)
-console.log(Notification.permission)
-console.log(Notification.requestPermission())
+console.log('Notification' in window)
 //Attempt to get permission to send notifications when someone joins room.
-if (Notification.permission === 'granted') {
-    console.log('Notification permission already granted!')
+if ('Notification' in window) {
+    if (Notification.permission === 'granted') {
+        console.log('Notification permission already granted!')
+    }
+    else {
+        Notification.requestPermission().then(function(result) {
+            if (result !== 'granted') {
+                alert('Please allow notifications if you want to be alerted when someone joins your room')
+            }
+        })
+    }
 }
 else {
-    Notification.requestPermission().then(function(result) {
-        if (result !== 'granted') {
-            alert('Please allow notifications if you want to be alerted when someone joins your room')
-        }
-    })
+    console.log('Notification is not supported')
 }
 
 peerConnection.ontrack = function({ streams: [stream] }) {
@@ -235,7 +243,6 @@ peerConnection.oniceconnectionstatechange = function() {
 }
 
 socket.on('store-load', data => {
-    console.log('store-load')
     const userInfo = document.getElementById('store-info')
     userInfo.innerHTML = userInfo.innerHTML + `Room Number: ${data.roomNumber}, Socket ID: ${data.socketid}`
 })
