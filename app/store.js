@@ -47,17 +47,8 @@ navigator.mediaDevices.enumerateDevices()
         camsAvailable = devices.filter(device => device.kind == 'videoinput')
         micsAvailable = devices.filter(device => device.kind == 'audioinput')
 
-        console.log('total cameras: ' + camsAvailable.length)
-        camsAvailable.forEach(camera => {
-            console.log(camera)
-        })
-
         //call getUserMedia once to ensure a full list of all video and audio devices
-        mediaConstraints = { video: camsAvailable.length >0, audio: micsAvailable.length > 0}
-        navigator.mediaDevices.getUserMedia(mediaConstraints)
-
-        camsAvailable = devices.filter(device => device.kind == 'videoinput')
-        micsAvailable = devices.filter(device => device.kind == 'audioinput')
+        mediaConstraints = { video: camsAvailable.length > 0, audio: micsAvailable.length > 0}
 
         console.log('total cameras: ' + camsAvailable.length)
         camsAvailable.forEach(camera => {
@@ -130,28 +121,46 @@ function initializeMediaDevices(stream) {
         micIcon.innerHTML = 'mic_off'
     }
 
-    setupCameraList()
+    return navigator.mediaDevices.enumerateDevices()
+    .then((devices) => {
+        setupCameraList(devices)
+    })
 }
 
-function setupCameraList() {
+function setupCameraList(devices) {
+    //Ensure we have latest list of devices (necessary when asking for permission as we have empty results beforehand)
+    camsAvailable = devices.filter(device => device.kind == 'videoinput')
+    micsAvailable = devices.filter(device => device.kind == 'audioinput')
+
+    const cameraOptions = document.getElementById('cam-select')
+    //Wipe out list to ensure no duplicates
+    while (cameraOptions.firstChild) {
+        cameraOptions.removeChild(cameraOptions.firstChild)
+    }
+
     if (myStream.getVideoTracks()[0]) {
         cameraSelected = myStream.getVideoTracks()[0].getSettings().deviceId
     }
-    console.log('camera selected: ' + cameraSelected)
 
-    const cameraOptions = document.getElementById('cam-select')
-    var noCameraOption = document.createElement('option')
-    noCameraOption.value = ''
-    noCameraOption.innerHTML = 'No Camera'
-    cameraOptions.appendChild(noCameraOption)
+    if (camsAvailable.length == 0) {
+        var noCameraOption = document.createElement('option')
+        noCameraOption.value = ''
+        noCameraOption.innerHTML = 'No Camera'
+        cameraOptions.appendChild(noCameraOption)
+    }
 
+    console.log(camsAvailable)
     camsAvailable.forEach(camera => {
+        console.log('camera1:')
+        console.log(camera)
         var camOption = document.createElement('option')
         camOption.value = camera.deviceId
         camOption.innerHTML = camera.label
+        console.log(camera.deviceId === cameraSelected)
         if (camera.deviceId === cameraSelected) {
             camOption.setAttribute('selected', 'selected')
         }
+        console.log(camOption)
         cameraOptions.appendChild(camOption)
     })
 }
