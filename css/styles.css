@@ -111,6 +111,7 @@ body {
 
   .information {
     white-space: nowrap;
+    display: none;
   }
   
   .active-users-panel {
