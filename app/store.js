@@ -183,6 +183,10 @@ function changeCamera(cameraDeviceId) {
     })
 }
 
+console.log("Notification:")
+console.log(Notification)
+console.log(Notification.permission)
+console.log(Notification.requestPermission())
 //Attempt to get permission to send notifications when someone joins room.
 if (Notification.permission === 'granted') {
     console.log('Notification permission already granted!')
