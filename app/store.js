@@ -19,7 +19,7 @@ menuButton.addEventListener('click', () => {
     if(!menuButtonSelected) {
         menuButton.classList.add('selected')
         menu.style.width = '100%'
-        informationDiv.style.display = 'block'
+        informationDiv.style.display = 'inline-block'
         menuButtonSelected = true
     }
     else {
@@ -44,6 +44,18 @@ if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices()) {
 //Start video and display on own screen
 navigator.mediaDevices.enumerateDevices()
     .then(devices => {
+        camsAvailable = devices.filter(device => device.kind == 'videoinput')
+        micsAvailable = devices.filter(device => device.kind == 'audioinput')
+
+        console.log('total cameras: ' + camsAvailable.length)
+        camsAvailable.forEach(camera => {
+            console.log(camera)
+        })
+
+        //call getUserMedia once to ensure a full list of all video and audio devices
+        mediaConstraints = { video: camsAvailable.length >0, audio: micsAvailable.length > 0}
+        navigator.mediaDevices.getUserMedia(mediaConstraints)
+
         camsAvailable = devices.filter(device => device.kind == 'videoinput')
         micsAvailable = devices.filter(device => device.kind == 'audioinput')
 
@@ -192,13 +204,21 @@ console.log("Notification:")
 console.log('Notification' in window)
 //Attempt to get permission to send notifications when someone joins room.
 if ('Notification' in window) {
+    var notificationIcon = document.getElementById('notificationIcon')
     if (Notification.permission === 'granted') {
         console.log('Notification permission already granted!')
+        var notificationIcon = document.getElementById('notificationIcon')
+        notificationIcon.innerHTML = 'notifications_active'
     }
     else {
         Notification.requestPermission().then(function(result) {
-            if (result !== 'granted') {
+            if (result === 'granted') {
+                var notificationIcon = document.getElementById('notificationIcon')
+                notificationIcon.innerHTML = 'notifications_active'
+            }
+            else {
                 alert('Please allow notifications if you want to be alerted when someone joins your room')
+                notificationIcon.innerHTML = 'notifications_off'
             }
         })
     }
@@ -244,7 +264,7 @@ peerConnection.oniceconnectionstatechange = function() {
 
 socket.on('store-load', data => {
     const userInfo = document.getElementById('store-info')
-    userInfo.innerHTML = userInfo.innerHTML + `Room Number: ${data.roomNumber}, Socket ID: ${data.socketid}`
+    userInfo.innerHTML = `Room Number: ${data.roomNumber}, Socket ID: ${data.socketid}`
 })
 
 async function callStoreViewUser(storeViewUserId) {

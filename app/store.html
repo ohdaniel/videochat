@@ -18,10 +18,12 @@
      <div class="menu-button">
        <div class="menu-button-burger"></div>
      </div>
-     <div class="information" hidden id="information">
-       <h1 class="talk-info" id="store-info">
+     <div class="information" id="information">
+       <span>
          <i class="material-icons md-7" id="infoIcon">info_outline</i>
-       </h1>
+         <i class="material-icons md-7" id="notificationIcon">notifications_off</i>
+       </span>
+       <span class="talk-info" id="store-info"></span>
        <div class="cam-options" hidden>
          Camera: 
          <select class="custom-select" id="cam-select" onChange="changeCamera(this.value)"></select>

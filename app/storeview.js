@@ -20,7 +20,7 @@ menuButton.addEventListener('click', () => {
     if(!menuButtonSelected) {
         menuButton.classList.add('selected')
         menu.style.width = '100%'
-        informationDiv.style.display = 'block'
+        informationDiv.style.display = 'inline-block'
         menuButtonSelected = true
     }
     else {
@@ -114,7 +114,7 @@ peerConnection.oniceconnectionstatechange = function() {
 
 socket.on('store-view-load', data => {
     const userInfo = document.getElementById('user-info')
-    userInfo.innerHTML = userInfo.innerHTML + `User ID: ${data.storeViewUserId}, Socket ID: ${data.socketid}`
+    userInfo.innerHTML = `User ID: ${data.storeViewUserId}, Socket ID: ${data.socketid}`
 })
 
 socket.on('update-room-list', ({ sockets, rooms }) => {
