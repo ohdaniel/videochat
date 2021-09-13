@@ -33,7 +33,6 @@ menuButton.addEventListener('click', () => {
     }
 })
 
-var cameraMode = 'environment' //Store starts off showing the back of the camera if there is one
 var cams
 var mics
 var mediaConstraints
@@ -44,12 +43,6 @@ navigator.mediaDevices.enumerateDevices()
     .then(devices => {
         cams = devices.filter(device => device.kind == 'videoinput')
         mics = devices.filter(device => device.kind == 'audioinput')
-
-        //If mobile device with exactly two cameras, have ability to swap between front and back camera
-        if (isMobile && cams.length === 2) {
-            cameraSwapButton.style.display = 'inline-block'
-        }
-
 
         mediaConstraints = { video: cams.length > 0, audio: mics.length > 0}
 
@@ -90,6 +83,16 @@ navigator.mediaDevices.enumerateDevices()
                 micButton.classList.replace('buttonEnabled', 'buttonDisabled')
                 micIcon.innerHTML = 'mic_off'
             }
+
+            return navigator.mediaDevices.enumerateDevices()
+            .then((devices) => {
+                //If mobile device with exactly two cameras, have ability to swap between front and back camera
+                if (isMobile && cams.length === 2) {
+                    cameraSwapButton.style.display = 'inline-block'
+                }
+                console.log("isMobile: " + isMobile)
+                console.log("cams.length: " + cams.length)
+            })
         }).catch(function(error) {
             console.warn(error)
         })
