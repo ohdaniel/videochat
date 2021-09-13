@@ -5,6 +5,8 @@ const configuration = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]}
 const {RTCPeerConnection, RTCSessionDescription} = window
 const peerConnection = new RTCPeerConnection(configuration)
 
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
 var myStream
 
 let isAlreadyCalling = false
@@ -149,10 +151,7 @@ function setupCameraList(devices) {
         cameraOptions.appendChild(noCameraOption)
     }
 
-    console.log(camsAvailable)
     camsAvailable.forEach(camera => {
-        console.log('camera1:')
-        console.log(camera)
         var camOption = document.createElement('option')
         camOption.value = camera.deviceId
         camOption.innerHTML = camera.label
@@ -244,32 +243,23 @@ peerConnection.oniceconnectionstatechange = function() {
         //Notify store that someone connected if tab isn't active
         if (Notification.permission === 'granted') {
             console.log(document.hasFocus())
-            // if (!document.hasFocus()) {
-                // var notification = new Notification('Someone joined your room!', {
-                //     icon: './img/call_received.png',
-                //     body: ''
-                // })
-            // }
-
-            navigator.serviceWorker.register('sw.js');
-            Notification.requestPermission(function (result) {
-                if (result === 'granted') {
-                    navigator.serviceWorker.ready.then(function (registration) {
-                        registration.showNotification('Video Chat', {
-                        body: 'Someone joined your room!',
-                        icon: './img/call_received.png',
-                        vibrate: [200, 100, 200, 100, 200, 100, 200],
-                        tag: 'vibration-sample',
-                        });
-                    });
-                }
-            });
-
-            // navigator.serviceWorker.ready.then(function(registration) {
-            //     registration.showNotification('Notification with ServiceWorker');
-            //   });
+            if (!document.hasFocus()) {
+                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.ready.then(function (registration) {
+                    registration.showNotification('Video Chat', {
+                    body: 'Someone joined your room!',
+                    icon: './img/call_received.png',
+                    vibrate: [200, 100, 200, 100, 200, 100, 200],
+                    tag: 'vibration-sample',
+                    })
+                })
+            }
         }
-        //TODO: send notification regardless if mobile device
+
+        if (isMobile) {
+            zoomOutMobile();
+        }
+        
     }
     if (iceConnectionState == 'disconnected') {
         //Clear out traces of old connection and setup screen to be able to connect to someone again
@@ -278,6 +268,15 @@ peerConnection.oniceconnectionstatechange = function() {
 
         //Make room available again
         socket.emit('make-socket-available', {})
+    }
+}
+
+function zoomOutMobile() {
+    var viewport = document.querySelector('meta[name="viewport"]');
+
+    if ( viewport ) {
+        viewport.content = "initial-scale=0.1";
+        viewport.content = "width=1200";
     }
 }
 
