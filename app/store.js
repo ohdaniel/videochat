@@ -244,12 +244,12 @@ peerConnection.oniceconnectionstatechange = function() {
         //Notify store that someone connected if tab isn't active
         if (Notification.permission === 'granted') {
             console.log(document.hasFocus())
-            if (!document.hasFocus()) {
+            // if (!document.hasFocus()) {
                 var notification = new Notification('Someone joined your room!', {
                     icon: './img/call_received.png',
                     body: ''
                 })
-            }
+            // }
         }
         //TODO: send notification regardless if mobile device
     }

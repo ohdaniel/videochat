@@ -254,6 +254,8 @@ cameraSwapButton.addEventListener('click', () => {
     changeCamera(otherCameraDeviceId)
 })
 
+console.log("isMobile: " + isMobile)
+console.log("cams.length: " + cams.length)
 //If mobile device with exactly two cameras, have ability to swap between front and back camera
 if (isMobile && cams.length === 2) {
     cameraSwapButton.style.display = 'inline-block'
