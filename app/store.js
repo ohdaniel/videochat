@@ -162,6 +162,14 @@ function setupCameraList(devices) {
         console.log(camOption)
         cameraOptions.appendChild(camOption)
     })
+
+    //If mobile device with exactly two cameras, have ability to swap between front and back camera
+    if (isMobile && cams.length === 2) {
+        const cameraSwap = document.getElementById('cameraSwapButton')
+        cameraSwap.style.display = 'inline-block'
+    }
+    console.log("isMobile: " + isMobile)
+    console.log("cams.length: " + camsAvailable.length)
 }
 
 function changeCamera(cameraDeviceId) {
@@ -371,6 +379,39 @@ micButton.addEventListener('click', () => {
         }
     }
 })
+
+const cameraSwapButton = document.getElementById('cameraSwapButton')
+cameraSwapButton.addEventListener('click', () => {
+    otherCameraDeviceId = cams.filter(device => device.deviceId !== stream.getVideoTracks()[0])
+    console.log("old deviceid: " + stream.getVideoTracks()[0])
+    console.log("new deviceid: " + otherCameraDeviceId)
+    changeCamera(otherCameraDeviceId)
+})
+
+function changeCamera(cameraDeviceId) {
+    mediaConstraints = {
+        video: {
+            deviceId: cameraDeviceId
+        }, audio: micsAvailable.length > 0}
+
+    navigator.mediaDevices.getUserMedia(mediaConstraints)
+    .then(function (stream) {
+        const localVideo = document.getElementById('local-video')
+        if (localVideo) {
+            localVideo.srcObject = stream
+        }
+        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
+
+        var videoTrack = stream.getVideoTracks()[0]
+        var sender = peerConnection.getSenders().find(function(rtcRtpSender) {
+            return rtcRtpSender.track.kind == 'video' //videoTrack.kind
+        })
+        sender.replaceTrack(videoTrack)
+
+    }).catch(function(error) {
+        console.warn(error)
+    })
+}
 
 const swapButton = document.getElementById('swapButton')
 swapButton.addEventListener('click', () => {
