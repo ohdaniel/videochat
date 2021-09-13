@@ -204,6 +204,10 @@ body {
     z-index: -1
   }
 
+  .call-store-view-user-input {
+    width: 50px;
+  }
+
   .active-room-panel {
     position: fixed;
     border: 1px solid #cddfe7;

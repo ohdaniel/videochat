@@ -30,16 +30,16 @@ menuButton.addEventListener('click', () => {
     }
 })
 
+if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices()) {
+    const userInfo = document.getElementById('store-info')
+    userInfo.innerHTML = 'This browser is not supported'
+}
+
 var cameraMode = 'environment' //Store starts off showing the back of the camera if there is one
 var camsAvailable
 var micsAvailableAvailable
 var mediaConstraints
 var cameraSelected = ''
-
-if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices()) {
-    const userInfo = document.getElementById('store-info')
-    userInfo.innerHTML = userInfo.innerHTML + 'This device is not supported'
-}
 
 //Start video and display on own screen
 navigator.mediaDevices.enumerateDevices()
@@ -47,13 +47,13 @@ navigator.mediaDevices.enumerateDevices()
         camsAvailable = devices.filter(device => device.kind == 'videoinput')
         micsAvailable = devices.filter(device => device.kind == 'audioinput')
 
-        //call getUserMedia once to ensure a full list of all video and audio devices
-        mediaConstraints = { video: camsAvailable.length > 0, audio: micsAvailable.length > 0}
+        // //call getUserMedia once to ensure a full list of all video and audio devices
+        // mediaConstraints = { video: camsAvailable.length > 0, audio: micsAvailable.length > 0}
 
-        console.log('total cameras: ' + camsAvailable.length)
-        camsAvailable.forEach(camera => {
-            console.log(camera)
-        })
+        // console.log('total cameras: ' + camsAvailable.length)
+        // camsAvailable.forEach(camera => {
+        //     console.log(camera)
+        // })
 
         //Initially use back camera if available
         if (camsAvailable.length > 0) {
@@ -186,18 +186,6 @@ function changeCamera(cameraDeviceId) {
         }
         stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
 
-        // peerConnection.removeStream(peerConnection.getLocalStreams()[0])
-        // peerConnection.addStream(stream)
-
-        // peerConnection.getSenders().forEach(rtcRtpSender => {
-        //     console.log(rtcRtpSender)
-        //     if (rtcRtpSender.track.kind  == 'video') {
-        //         console.log('video rtcrpSender!')
-        //         console.log(rtcRtpSender)
-        //         rtcRtpSender.replaceTrack(stream.getVideoTracks()[0])
-        //     }
-        // })
-
         var videoTrack = stream.getVideoTracks()[0]
         var sender = peerConnection.getSenders().find(function(rtcRtpSender) {
             return rtcRtpSender.track.kind == 'video' //videoTrack.kind
@@ -257,9 +245,13 @@ peerConnection.oniceconnectionstatechange = function() {
         if (Notification.permission === 'granted') {
             console.log(document.hasFocus())
             if (!document.hasFocus()) {
-                var notification = new Notification('Someone joined your room!')
+                var notification = new Notification('Someone joined your room!', {
+                    icon: './img/call_received.png',
+                    body: ''
+                })
             }
         }
+        //TODO: send notification regardless if mobile device
     }
     if (iceConnectionState == 'disconnected') {
         //Clear out traces of old connection and setup screen to be able to connect to someone again

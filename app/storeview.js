@@ -5,6 +5,8 @@ const configuration = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]}
 const {RTCPeerConnection, RTCSessionDescription} = window
 const peerConnection = new RTCPeerConnection(configuration)
 
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
 var myStream
 var currentRoomNumber = null
 
@@ -31,13 +33,19 @@ menuButton.addEventListener('click', () => {
     }
 })
 
+var cameraMode = 'environment' //Store starts off showing the back of the camera if there is one
+var cams
+var mics
+var mediaConstraints
+var cameraSelected = ''
+
 //Start video and display on own screen
 navigator.mediaDevices.enumerateDevices()
     .then(devices => {
-        const cams = devices.filter(device => device.kind == 'videoinput')
-        const mics = devices.filter(device => device.kind == 'audioinput')
+        cams = devices.filter(device => device.kind == 'videoinput')
+        mics = devices.filter(device => device.kind == 'audioinput')
 
-        const mediaConstraints = { video: cams.length > 0, audio: mics.length > 0}
+        mediaConstraints = { video: cams.length > 0, audio: mics.length > 0}
 
         return navigator.mediaDevices.getUserMedia(mediaConstraints)
     })
@@ -239,6 +247,42 @@ micButton.addEventListener('click', () => {
         }
     }
 })
+
+const cameraSwapButton = document.getElementById('cameraSwapButton')
+cameraSwapButton.addEventListener('click', () => {
+    otherCameraDeviceId = cams.filter(device => device.deviceId !== stream.getVideoTracks()[0])
+    changeCamera(otherCameraDeviceId)
+})
+
+//If mobile device with exactly two cameras, have ability to swap between front and back camera
+if (isMobile && cams.length === 2) {
+    cameraSwapButton.style.display = 'inline-block'
+}
+
+function changeCamera(cameraDeviceId) {
+    mediaConstraints = {
+        video: {
+            deviceId: cameraDeviceId
+        }, audio: micsAvailable.length > 0}
+
+    navigator.mediaDevices.getUserMedia(mediaConstraints)
+    .then(function (stream) {
+        const localVideo = document.getElementById('local-video')
+        if (localVideo) {
+            localVideo.srcObject = stream
+        }
+        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
+
+        var videoTrack = stream.getVideoTracks()[0]
+        var sender = peerConnection.getSenders().find(function(rtcRtpSender) {
+            return rtcRtpSender.track.kind == 'video' //videoTrack.kind
+        })
+        sender.replaceTrack(videoTrack)
+
+    }).catch(function(error) {
+        console.warn(error)
+    })
+}
 
 const swapButton = document.getElementById('swapButton')
 swapButton.addEventListener('click', () => {
