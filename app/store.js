@@ -242,8 +242,7 @@ peerConnection.oniceconnectionstatechange = function() {
 
         //Notify store that someone connected if tab isn't active
         if (Notification.permission === 'granted') {
-            console.log(document.hasFocus())
-            if (!document.hasFocus()) {
+            if (document.visibilityState === 'hidden') {
                 navigator.serviceWorker.register('sw.js')
                 navigator.serviceWorker.ready.then(function (registration) {
                     registration.showNotification('Video Chat', {
@@ -274,9 +273,9 @@ peerConnection.oniceconnectionstatechange = function() {
 function zoomOutMobile() {
     var viewport = document.querySelector('meta[name="viewport"]');
 
-    if ( viewport ) {
+    if (viewport) {
         viewport.content = "initial-scale=0.1";
-        viewport.content = "width=1200";
+        viewport.content = "width=device-width";
     }
 }
 
