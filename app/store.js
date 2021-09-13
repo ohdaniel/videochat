@@ -144,6 +144,11 @@ function setupCameraList(devices) {
         cameraSelected = myStream.getVideoTracks()[0].getSettings().deviceId
     }
 
+    console.log("isMobile: ")
+    console.log(isMobile)
+    console.log("cams.length: ")
+    console.log(camsAvailable.length)
+
     if (camsAvailable.length == 0) {
         var noCameraOption = document.createElement('option')
         noCameraOption.value = ''
@@ -163,13 +168,15 @@ function setupCameraList(devices) {
         cameraOptions.appendChild(camOption)
     })
 
+    console.log("isMobile: ")
+    console.log(isMobile)
+    console.log("cams.length: ")
+    console.log(camsAvailable.length)
     //If mobile device with exactly two cameras, have ability to swap between front and back camera
-    if (isMobile && cams.length === 2) {
+    if (isMobile && cams.length == 2) {
         const cameraSwap = document.getElementById('cameraSwapButton')
         cameraSwap.style.display = 'inline-block'
     }
-    console.log("isMobile: " + isMobile)
-    console.log("cams.length: " + camsAvailable.length)
 }
 
 function changeCamera(cameraDeviceId) {
