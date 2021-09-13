@@ -45,6 +45,12 @@ navigator.mediaDevices.enumerateDevices()
         cams = devices.filter(device => device.kind == 'videoinput')
         mics = devices.filter(device => device.kind == 'audioinput')
 
+        //If mobile device with exactly two cameras, have ability to swap between front and back camera
+        if (isMobile && cams.length === 2) {
+            cameraSwapButton.style.display = 'inline-block'
+        }
+
+
         mediaConstraints = { video: cams.length > 0, audio: mics.length > 0}
 
         return navigator.mediaDevices.getUserMedia(mediaConstraints)
@@ -253,13 +259,6 @@ cameraSwapButton.addEventListener('click', () => {
     otherCameraDeviceId = cams.filter(device => device.deviceId !== stream.getVideoTracks()[0])
     changeCamera(otherCameraDeviceId)
 })
-
-console.log("isMobile: " + isMobile)
-console.log("cams.length: " + cams.length)
-//If mobile device with exactly two cameras, have ability to swap between front and back camera
-if (isMobile && cams.length === 2) {
-    cameraSwapButton.style.display = 'inline-block'
-}
 
 function changeCamera(cameraDeviceId) {
     mediaConstraints = {

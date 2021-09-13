@@ -245,11 +245,29 @@ peerConnection.oniceconnectionstatechange = function() {
         if (Notification.permission === 'granted') {
             console.log(document.hasFocus())
             // if (!document.hasFocus()) {
-                var notification = new Notification('Someone joined your room!', {
-                    icon: './img/call_received.png',
-                    body: ''
-                })
+                // var notification = new Notification('Someone joined your room!', {
+                //     icon: './img/call_received.png',
+                //     body: ''
+                // })
             // }
+
+            navigator.serviceWorker.register('sw.js');
+            Notification.requestPermission(function (result) {
+                if (result === 'granted') {
+                    navigator.serviceWorker.ready.then(function (registration) {
+                        registration.showNotification('Video Chat', {
+                        body: 'Someone joined your room!',
+                        icon: './img/call_received.png',
+                        vibrate: [200, 100, 200, 100, 200, 100, 200],
+                        tag: 'vibration-sample',
+                        });
+                    });
+                }
+            });
+
+            // navigator.serviceWorker.ready.then(function(registration) {
+            //     registration.showNotification('Notification with ServiceWorker');
+            //   });
         }
         //TODO: send notification regardless if mobile device
     }
