@@ -272,16 +272,16 @@ peerConnection.oniceconnectionstatechange = function() {
         socket.emit('make-socket-available', {})
     }
 }
-console.log(document.querySelector('meta[name="viewport"]'))
+console.log(document.querySelector('meta[name="viewport"]').content)
 function zoomOutMobile() {
     var viewport = document.querySelector('meta[name="viewport"]')
-    console.log(viewport)
+    console.log(viewport.content)
 
     if (viewport) {
         viewport.content = "width=device-width";
         viewport.content = "initial-scale=0";
     }
-    console.log(viewport)
+    console.log(viewport.content)
 }
 
 socket.on('store-load', data => {
