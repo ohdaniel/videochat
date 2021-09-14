@@ -39,7 +39,7 @@ if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices()) {
 
 var cameraMode = 'environment' //Store starts off showing the back of the camera if there is one
 var camsAvailable
-var micsAvailableAvailable
+var micsAvailable
 var mediaConstraints
 var cameraSelected = ''
 
@@ -378,7 +378,7 @@ micButton.addEventListener('click', () => {
 const cameraSwapButton = document.getElementById('cameraSwapButton')
 cameraSwapButton.addEventListener('click', () => {
     console.log("old deviceid: " + myStream.getVideoTracks()[0].id)
-    otherCamera = camsAvailable.filter(device => device.deviceId != myStream.getVideoTracks()[0].id)
+    var otherCamera = camsAvailable.filter(device => device.deviceId != myStream.getVideoTracks()[0].id)
     console.log("new deviceid: " + otherCamera.deviceId)
     changeCamera(otherCamera.deviceId)
 })
