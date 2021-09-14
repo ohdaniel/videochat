@@ -243,6 +243,10 @@ peerConnection.oniceconnectionstatechange = function() {
         document.getElementById('call-store-view-user-container').style.display = 'none'
         socket.emit('connection-succeeded', {})
 
+        if (isMobile) {
+            zoomOutMobile();
+        }
+
         //Notify store that someone connected if tab isn't active
         if (Notification.permission === 'granted') {
             if (document.visibilityState === 'hidden') {
@@ -257,11 +261,8 @@ peerConnection.oniceconnectionstatechange = function() {
                 })
             }
         }
-
-        if (isMobile) {
-            zoomOutMobile();
-        }
         
+        console.log('End of connect success')
     }
     if (iceConnectionState == 'disconnected') {
         //Clear out traces of old connection and setup screen to be able to connect to someone again
@@ -380,9 +381,9 @@ micButton.addEventListener('click', () => {
 const cameraSwapButton = document.getElementById('cameraSwapButton')
 cameraSwapButton.addEventListener('click', () => {
     console.log("old deviceid: " + myStream.getVideoTracks()[0])
-    console.log("new deviceid: " + otherCameraDeviceId)
-    otherCameraDeviceId = cams.filter(device => device.deviceId !== myStream.getVideoTracks()[0])
-    changeCamera(otherCameraDeviceId)
+    otherCamera = cams.filter(device => device.deviceId !== myStream.getVideoTracks()[0])
+    console.log("new deviceid: " + otherCamera.deviceId)
+    changeCamera(otherCamera.deviceId)
 })
 
 function changeCamera(cameraDeviceId) {
