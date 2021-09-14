@@ -203,21 +203,18 @@ console.log("Notification:")
 console.log('Notification' in window)
 //Attempt to get permission to send notifications when someone joins room.
 if ('Notification' in window) {
-    var notificationIcon = document.getElementById('notificationIcon')
     if (Notification.permission === 'granted') {
         console.log('Notification permission already granted!')
-        var notificationIcon = document.getElementById('notificationIcon')
-        notificationIcon.innerHTML = 'notifications_active'
+        document.getElementById('notificationIcon').innerHTML = 'notifications_active'
     }
     else {
         Notification.requestPermission().then(function(result) {
             if (result === 'granted') {
-                var notificationIcon = document.getElementById('notificationIcon')
-                notificationIcon.innerHTML = 'notifications_active'
+                document.getElementById('notificationIcon').innerHTML = 'notifications_active'
             }
             else {
                 alert('Please allow notifications if you want to be alerted when someone joins your room')
-                notificationIcon.innerHTML = 'notifications_off'
+                document.getElementById('notificationIcon').innerHTML = 'notifications_off'
             }
         })
     }
@@ -380,8 +377,8 @@ micButton.addEventListener('click', () => {
 
 const cameraSwapButton = document.getElementById('cameraSwapButton')
 cameraSwapButton.addEventListener('click', () => {
-    console.log("old deviceid: " + myStream.getVideoTracks()[0])
-    otherCamera = cams.filter(device => device.deviceId !== myStream.getVideoTracks()[0])
+    console.log("old deviceid: " + myStream.getVideoTracks()[0].deviceId)
+    otherCamera = cams.filter(device => device.deviceId != myStream.getVideoTracks()[0].deviceId)
     console.log("new deviceid: " + otherCamera.deviceId)
     changeCamera(otherCamera.deviceId)
 })
