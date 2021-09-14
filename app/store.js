@@ -167,38 +167,6 @@ function setupCameraList(devices) {
     }
 }
 
-function changeCamera(cameraDeviceId) {
-    cameraSelected = cameraDeviceId
-
-    if (cameraSelected === '') {
-        mediaConstraints = { video: false, audio: micsAvailable.length > 0}
-    }
-    else {
-        mediaConstraints = {
-            video: {
-                deviceId: cameraSelected
-            }, audio: micsAvailable.length > 0}
-    }
-
-    navigator.mediaDevices.getUserMedia(mediaConstraints)
-    .then(function (stream) {
-        const localVideo = document.getElementById('local-video')
-        if (localVideo) {
-            localVideo.srcObject = stream
-        }
-        stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
-
-        var videoTrack = stream.getVideoTracks()[0]
-        var sender = peerConnection.getSenders().find(function(rtcRtpSender) {
-            return rtcRtpSender.track.kind == 'video' //videoTrack.kind
-        })
-        sender.replaceTrack(videoTrack)
-
-    }).catch(function(error) {
-        console.warn(error)
-    })
-}
-
 console.log("Notification:")
 console.log('Notification' in window)
 //Attempt to get permission to send notifications when someone joins room.
@@ -378,16 +346,22 @@ micButton.addEventListener('click', () => {
 const cameraSwapButton = document.getElementById('cameraSwapButton')
 cameraSwapButton.addEventListener('click', () => {
     console.log("old deviceid: " + myStream.getVideoTracks()[0].id)
+    console.log(camsAvailable.length)
     var otherCamera = camsAvailable.filter(device => device.deviceId != myStream.getVideoTracks()[0].id)
     console.log("new deviceid: " + otherCamera.deviceId)
     changeCamera(otherCamera.deviceId)
 })
 
 function changeCamera(cameraDeviceId) {
-    mediaConstraints = {
-        video: {
-            deviceId: cameraDeviceId
-        }, audio: micsAvailable.length > 0}
+    if (cameraDeviceId === '') {
+        mediaConstraints = { video: false, audio: micsAvailable.length > 0}
+    }
+    else {
+        mediaConstraints = {
+            video: {
+                deviceId: cameraDeviceId
+            }, audio: micsAvailable.length > 0}
+    }
 
     navigator.mediaDevices.getUserMedia(mediaConstraints)
     .then(function (stream) {
@@ -396,6 +370,8 @@ function changeCamera(cameraDeviceId) {
             localVideo.srcObject = stream
         }
         stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
+
+        myStream = stream
 
         var videoTrack = stream.getVideoTracks()[0]
         var sender = peerConnection.getSenders().find(function(rtcRtpSender) {
