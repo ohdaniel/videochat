@@ -377,8 +377,8 @@ micButton.addEventListener('click', () => {
 
 const cameraSwapButton = document.getElementById('cameraSwapButton')
 cameraSwapButton.addEventListener('click', () => {
-    console.log("old deviceid: " + myStream.getVideoTracks()[0].deviceId)
-    otherCamera = cams.filter(device => device.deviceId != myStream.getVideoTracks()[0].deviceId)
+    console.log("old deviceid: " + myStream.getVideoTracks()[0].id)
+    otherCamera = cams.filter(device => device.deviceId != myStream.getVideoTracks()[0].id)
     console.log("new deviceid: " + otherCamera.deviceId)
     changeCamera(otherCamera.deviceId)
 })
