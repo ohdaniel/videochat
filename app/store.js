@@ -159,6 +159,7 @@ function setupCameraList(devices) {
             camOption.setAttribute('selected', 'selected')
         }
         cameraOptions.appendChild(camOption)
+        console.log(camera.deviceId)
     })
 
     //If mobile device with exactly two cameras, have ability to swap between front and back camera
@@ -348,7 +349,13 @@ cameraSwapButton.addEventListener('click', () => {
     console.log("old deviceid: " + myStream.getVideoTracks()[0].getSettings().deviceId)
     console.log(camsAvailable.length)
     var otherCamera = camsAvailable.filter(device => device.deviceId != myStream.getVideoTracks()[0].getSettings().deviceId)
+    console.log(otherCamera)
+    console.log(otherCamera.length)
     console.log("new deviceid: " + otherCamera.deviceId)
+
+    var thisCamera = camsAvailable.filter(device => device.deviceId == myStream.getVideoTracks()[0].getSettings().deviceId)
+    console.log(thisCamera)
+    console.log(thisCamera.length)
     changeCamera(otherCamera.deviceId)
 })
 
