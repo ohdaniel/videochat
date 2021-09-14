@@ -144,11 +144,6 @@ function setupCameraList(devices) {
         cameraSelected = myStream.getVideoTracks()[0].getSettings().deviceId
     }
 
-    console.log("isMobile: ")
-    console.log(isMobile)
-    console.log("cams.length: ")
-    console.log(camsAvailable.length)
-
     if (camsAvailable.length == 0) {
         var noCameraOption = document.createElement('option')
         noCameraOption.value = ''
@@ -166,13 +161,8 @@ function setupCameraList(devices) {
         cameraOptions.appendChild(camOption)
     })
 
-    console.log("isMobile: ")
-    console.log(isMobile)
-    console.log("cams.length: ")
-    console.log(camsAvailable.length)
     //If mobile device with exactly two cameras, have ability to swap between front and back camera
-    if (isMobile && cams.length == 2) {
-        console.log("display cameraswap button")
+    if (isMobile && camsAvailable.length == 2) {
         document.getElementById('cameraSwapButton').style.display = 'inline-block'
     }
 }
@@ -282,14 +272,16 @@ peerConnection.oniceconnectionstatechange = function() {
         socket.emit('make-socket-available', {})
     }
 }
-
+console.log(document.querySelector('meta[name="viewport"]'))
 function zoomOutMobile() {
-    var viewport = document.querySelector('meta[name="viewport"]');
+    var viewport = document.querySelector('meta[name="viewport"]')
+    console.log(viewport)
 
     if (viewport) {
         viewport.content = "width=device-width";
         viewport.content = "initial-scale=0";
     }
+    console.log(viewport)
 }
 
 socket.on('store-load', data => {
