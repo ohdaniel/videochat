@@ -86,12 +86,13 @@ navigator.mediaDevices.enumerateDevices()
 
             return navigator.mediaDevices.enumerateDevices()
             .then((devices) => {
-                //If mobile device with exactly two cameras, have ability to swap between front and back camera
-                if (isMobile && cams.length === 2) {
-                    cameraSwapButton.style.display = 'inline-block'
-                }
                 console.log("isMobile: " + isMobile)
                 console.log("cams.length: " + cams.length)
+                //If mobile device with exactly two cameras, have ability to swap between front and back camera
+                if (isMobile && cams.length === 2) {
+                    const cameraSwap = document.getElementById('cameraSwapButton')
+                    cameraSwap.style.display = 'inline-block'
+                }
             })
         }).catch(function(error) {
             console.warn(error)
@@ -116,6 +117,9 @@ peerConnection.oniceconnectionstatechange = function() {
         }
         document.getElementById('active-room-container').style.display = 'none'
         socket.emit('connection-succeeded', {})
+
+        var connectionSucceededSound = new Audio('https://actions.google.com/sounds/v1/doors/wood_door_open.ogg')
+        connectionSucceededSound.play()
     }
     if (iceConnectionState == 'disconnected') {
         //Clear out traces of old connection and setup screen to be able to connect to someone again
@@ -259,8 +263,8 @@ micButton.addEventListener('click', () => {
 
 const cameraSwapButton = document.getElementById('cameraSwapButton')
 cameraSwapButton.addEventListener('click', () => {
-    otherCameraDeviceId = cams.filter(device => device.deviceId !== stream.getVideoTracks()[0])
-    changeCamera(otherCameraDeviceId)
+    otherCamera = cams.filter(device => device.deviceId !== myStream.getVideoTracks()[0])
+    changeCamera(otherCamera.deviceId)
 })
 
 function changeCamera(cameraDeviceId) {

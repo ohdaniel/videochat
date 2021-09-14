@@ -161,10 +161,17 @@ function setupCameraList(devices) {
         cameraOptions.appendChild(camOption)
     })
 
+    const userInfo = document.getElementById('store-info')
+    userInfo.innerHTML = userInfo.innerHTML + ', Cameras: ' + camsAvailable.length
     //If mobile device with exactly two cameras, have ability to swap between front and back camera
     if (isMobile && camsAvailable.length == 2) {
         document.getElementById('cameraSwapButton').style.display = 'inline-block'
     }
+    //Else show drop down with a list of all possible cameras
+    else {
+        document.getElementById('camOptions').style.display = 'block'
+    }
+    
 }
 
 console.log("Notification:")
@@ -226,6 +233,9 @@ peerConnection.oniceconnectionstatechange = function() {
                 })
             }
         }
+
+        var connectionSucceededSound = new Audio('https://actions.google.com/sounds/v1/doors/wood_door_open.ogg')
+        connectionSucceededSound.play()
         
         console.log('End of connect success')
     }
@@ -252,7 +262,7 @@ function zoomOutMobile() {
 
 socket.on('store-load', data => {
     const userInfo = document.getElementById('store-info')
-    userInfo.innerHTML = `Room Number: ${data.roomNumber}, Socket ID: ${data.socketid}`
+    userInfo.innerHTML = `Room Number: ${data.roomNumber}` //`Room Number: ${data.roomNumber}, Socket ID: ${data.socketid}`
 })
 
 async function callStoreViewUser(storeViewUserId) {
@@ -370,11 +380,16 @@ function changeCamera(cameraDeviceId) {
 
         myStream = stream
 
-        var videoTrack = stream.getVideoTracks()[0]
-        var sender = peerConnection.getSenders().find(function(rtcRtpSender) {
-            return rtcRtpSender.track.kind == 'video' //videoTrack.kind
-        })
-        sender.replaceTrack(videoTrack)
+        if (myStream.getVideoTracks()[0]) {
+            cameraSelected = myStream.getVideoTracks()[0].getSettings().deviceId
+
+            //Update others about new camera input
+            var videoTrack = stream.getVideoTracks()[0]
+            var sender = peerConnection.getSenders().find(function(rtcRtpSender) {
+                return rtcRtpSender.track.kind == 'video' //videoTrack.kind
+            })
+            sender.replaceTrack(videoTrack)
+        }
 
     }).catch(function(error) {
         console.warn(error)
