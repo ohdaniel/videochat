@@ -160,11 +160,9 @@ function setupCameraList(devices) {
         var camOption = document.createElement('option')
         camOption.value = camera.deviceId
         camOption.innerHTML = camera.label
-        console.log(camera.deviceId === cameraSelected)
         if (camera.deviceId === cameraSelected) {
             camOption.setAttribute('selected', 'selected')
         }
-        console.log(camOption)
         cameraOptions.appendChild(camOption)
     })
 
@@ -174,8 +172,8 @@ function setupCameraList(devices) {
     console.log(camsAvailable.length)
     //If mobile device with exactly two cameras, have ability to swap between front and back camera
     if (isMobile && cams.length == 2) {
-        const cameraSwap = document.getElementById('cameraSwapButton')
-        cameraSwap.style.display = 'inline-block'
+        console.log("display cameraswap button")
+        document.getElementById('cameraSwapButton').style.display = 'inline-block'
     }
 }
 
@@ -289,8 +287,8 @@ function zoomOutMobile() {
     var viewport = document.querySelector('meta[name="viewport"]');
 
     if (viewport) {
-        viewport.content = "initial-scale=0.1";
         viewport.content = "width=device-width";
+        viewport.content = "initial-scale=0";
     }
 }
 
