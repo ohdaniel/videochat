@@ -223,27 +223,29 @@ peerConnection.oniceconnectionstatechange = function() {
         document.getElementById('call-store-view-user-container').style.display = 'none'
         socket.emit('connection-succeeded', {})
 
+        if (isAlertOn) {
+            iceConnectionSucceededSound.play()
+        }
+
         // if (isMobile) {
         //     zoomOutMobile();
         // }
 
         //Notify store that someone connected if tab isn't active
-        if (Notification.permission === 'granted') {
-            if (document.visibilityState === 'hidden') {
-                navigator.serviceWorker.register('sw.js')
-                navigator.serviceWorker.ready.then(function (registration) {
-                    registration.showNotification('Video Chat', {
-                    body: 'Someone joined your room!',
-                    icon: './img/call_received.png',
-                    vibrate: [200, 100, 200, 100, 200, 100, 200],
-                    tag: 'vibration-sample',
+        if ('Notification' in window) {
+            if (Notification.permission === 'granted') {
+                if (document.visibilityState === 'hidden') {
+                    navigator.serviceWorker.register('sw.js')
+                    navigator.serviceWorker.ready.then(function (registration) {
+                        registration.showNotification('Video Chat', {
+                        body: 'Someone joined your room!',
+                        icon: './img/call_received.png',
+                        vibrate: [200, 100, 200, 100, 200, 100, 200],
+                        tag: 'vibration-sample',
+                        })
                     })
-                })
+                }
             }
-        }
-
-        if (isAlertOn) {
-            iceConnectionSucceededSound.play()
         }
         
         console.log('End of connect success')
