@@ -223,9 +223,9 @@ peerConnection.oniceconnectionstatechange = function() {
         document.getElementById('call-store-view-user-container').style.display = 'none'
         socket.emit('connection-succeeded', {})
 
-        if (isMobile) {
-            zoomOutMobile();
-        }
+        // if (isMobile) {
+        //     zoomOutMobile();
+        // }
 
         //Notify store that someone connected if tab isn't active
         if (Notification.permission === 'granted') {
@@ -261,17 +261,17 @@ peerConnection.oniceconnectionstatechange = function() {
         }
     }
 }
-console.log(document.querySelector('meta[name="viewport"]').content)
-function zoomOutMobile() {
-    var viewport = document.querySelector('meta[name="viewport"]')
-    console.log(viewport.content)
+// console.log(document.querySelector('meta[name="viewport"]').content)
+// function zoomOutMobile() {
+//     var viewport = document.querySelector('meta[name="viewport"]')
+//     console.log(viewport.content)
 
-    if (viewport) {
-        viewport.content = "width=device-width";
-        viewport.content = "initial-scale=0";
-    }
-    console.log(viewport.content)
-}
+//     if (viewport) {
+//         viewport.content = "width=device-width";
+//         viewport.content = "initial-scale=0";
+//     }
+//     console.log(viewport.content)
+// }
 
 socket.on('store-load', data => {
     const userInfo = document.getElementById('store-info')
