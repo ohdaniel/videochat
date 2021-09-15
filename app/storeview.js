@@ -88,10 +88,11 @@ navigator.mediaDevices.enumerateDevices()
             .then((devices) => {
                 console.log("isMobile: " + isMobile)
                 console.log("cams.length: " + cams.length)
+                const userInfo = document.getElementById('user-info')
+                userInfo.innerHTML = userInfo.innerHTML + ', Cameras: ' + cams.length
                 //If mobile device with exactly two cameras, have ability to swap between front and back camera
                 if (isMobile && cams.length === 2) {
-                    const cameraSwap = document.getElementById('cameraSwapButton')
-                    cameraSwap.style.display = 'inline-block'
+                    document.getElementById('cameraSwapButton').style.display = 'inline-block'
                 }
             })
         }).catch(function(error) {
@@ -118,8 +119,8 @@ peerConnection.oniceconnectionstatechange = function() {
         document.getElementById('active-room-container').style.display = 'none'
         socket.emit('connection-succeeded', {})
 
-        var connectionSucceededSound = new Audio('https://actions.google.com/sounds/v1/doors/wood_door_open.ogg')
-        connectionSucceededSound.play()
+        // var connectionSucceededSound = new Audio('https://actions.google.com/sounds/v1/doors/wood_door_open.ogg')
+        // connectionSucceededSound.play()
     }
     if (iceConnectionState == 'disconnected') {
         //Clear out traces of old connection and setup screen to be able to connect to someone again
@@ -135,7 +136,7 @@ peerConnection.oniceconnectionstatechange = function() {
 
 socket.on('store-view-load', data => {
     const userInfo = document.getElementById('user-info')
-    userInfo.innerHTML = `User ID: ${data.storeViewUserId}, Socket ID: ${data.socketid}`
+    userInfo.innerHTML = `User ID: ${data.storeViewUserId}` //`, Socket ID: ${data.socketid}`
 })
 
 socket.on('update-room-list', ({ sockets, rooms }) => {

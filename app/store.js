@@ -43,6 +43,14 @@ var micsAvailable
 var mediaConstraints
 var cameraSelected = ''
 
+var isPushNotificationOn = false //default
+var isAlertOn = false //default false, need user action in order to play audio on mobile
+var iceConnectionSucceededSound = new Audio('./audio/glass_drop_and_roll.mp3')
+iceConnectionSucceededSound.volume = 0.0
+var iceConnectionDisconnectedSound = new Audio('./audio/screen_door_close.mp3')
+iceConnectionDisconnectedSound.volume = 0.0
+
+
 //Start video and display on own screen
 navigator.mediaDevices.enumerateDevices()
     .then(devices => {
@@ -161,8 +169,8 @@ function setupCameraList(devices) {
         cameraOptions.appendChild(camOption)
     })
 
-    const userInfo = document.getElementById('store-info')
-    userInfo.innerHTML = userInfo.innerHTML + ', Cameras: ' + camsAvailable.length
+    const storeInfo = document.getElementById('store-info')
+    storeInfo.innerHTML = storeInfo.innerHTML + ', Cameras: ' + camsAvailable.length
     //If mobile device with exactly two cameras, have ability to swap between front and back camera
     if (isMobile && camsAvailable.length == 2) {
         document.getElementById('cameraSwapButton').style.display = 'inline-block'
@@ -176,20 +184,20 @@ function setupCameraList(devices) {
 
 console.log("Notification:")
 console.log('Notification' in window)
-//Attempt to get permission to send notifications when someone joins room.
+// Attempt to get permission to send notifications when someone joins room.
 if ('Notification' in window) {
     if (Notification.permission === 'granted') {
         console.log('Notification permission already granted!')
-        document.getElementById('notificationIcon').innerHTML = 'notifications_active'
+        document.getElementById('notificationIcon').innerHTML = 'speaker_notes'
     }
     else {
         Notification.requestPermission().then(function(result) {
             if (result === 'granted') {
-                document.getElementById('notificationIcon').innerHTML = 'notifications_active'
+                document.getElementById('notificationIcon').innerHTML = 'speaker_notes'
             }
             else {
                 alert('Please allow notifications if you want to be alerted when someone joins your room')
-                document.getElementById('notificationIcon').innerHTML = 'notifications_off'
+                document.getElementById('notificationIcon').innerHTML = 'speaker_notes_off'
             }
         })
     }
@@ -234,8 +242,9 @@ peerConnection.oniceconnectionstatechange = function() {
             }
         }
 
-        var connectionSucceededSound = new Audio('https://actions.google.com/sounds/v1/doors/wood_door_open.ogg')
-        connectionSucceededSound.play()
+        if (isAlertOn) {
+            iceConnectionSucceededSound.play()
+        }
         
         console.log('End of connect success')
     }
@@ -246,6 +255,10 @@ peerConnection.oniceconnectionstatechange = function() {
 
         //Make room available again
         socket.emit('make-socket-available', {})
+
+        if (isAlertOn) {
+            iceConnectionDisconnectedSound.play()
+        }
     }
 }
 console.log(document.querySelector('meta[name="viewport"]').content)
@@ -304,6 +317,25 @@ socket.on('answer-made', async data => {
     if (!isAlreadyCalling) {
         callUser(data.socket)
         isAlreadyCalling = true
+    }
+})
+
+const alertIcon = document.getElementById('alertIcon')
+alertIcon.addEventListener('click', () => {    
+    iceConnectionSucceededSound.play().then(() => iceConnectionSucceededSound.pause())
+    iceConnectionDisconnectedSound.play().then(() => iceConnectionDisconnectedSound.pause())
+
+    isAlertOn = !isAlertOn
+
+    if (isAlertOn) {
+        iceConnectionSucceededSound.volume = 1.0
+        iceConnectionDisconnectedSound.volume = 1.0
+        alertIcon.innerHTML = 'notifications_active'
+    }
+    else {
+        iceConnectionSucceededSound.volume = 0.0
+        iceConnectionDisconnectedSound.volume = 0.0
+        alertIcon.innerHTML = 'notifications_off'
     }
 })
 
