@@ -144,6 +144,10 @@ socket.on('update-room-list', ({ sockets, rooms }) => {
 })
 
 function updateRoomList(sockets, rooms) {
+    if (sockets.length > 0) {
+        deleteEmptyRoomDiv()
+    }
+
     const activeUserContainer = document.getElementById('active-room-container')
 
     for (var i = 0; i < sockets.length; i++) {
@@ -191,7 +195,36 @@ socket.on('remove-room', ({ roomNumber }) => {
     if (elementToRemove) {
         elementToRemove.remove()
     }
+
+    if (document.querySelectorAll('.active-room').length == 0) {
+        addEmptyRoomDiv()
+    }
 })
+
+function addEmptyRoomDiv() {
+    const activeUserContainer = document.getElementById('active-room-container')
+
+    const userContainerElement = document.createElement('div')
+    const userIconElement = document.createElement('i')
+    const usernameElement = document.createElement('span')
+
+    userContainerElement.setAttribute('class', 'active-room')
+    userContainerElement.setAttribute('id', 'emptyRoom')
+    userIconElement.setAttribute('class','material-icons md-20')
+    userIconElement.innerHTML = 'mood_bad'
+    usernameElement.innerHTML = ' No one is available, please call for service'
+
+    userContainerElement.append(userIconElement)
+    userContainerElement.append(usernameElement)
+    activeUserContainer.append(userContainerElement)
+}
+
+function deleteEmptyRoomDiv() {
+    const emptyRoom = document.getElementById('emptyRoom')
+    if (emptyRoom) {
+        emptyRoom.remove()
+    }
+}
 
 async function callUser(socketId) {
     var offerConstraints = { offerToReceiveAudio: true, offerToReceiveVideo: true } //In the event the current screen doesn't have either video or audio, will always accept video and audio from user called
