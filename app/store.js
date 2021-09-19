@@ -18,7 +18,7 @@ const menu = document.getElementById('menu')
 const menuButton = document.querySelector('.menu-button')
 const informationDiv = document.getElementById('information')
 menuButton.addEventListener('click', () => {
-    if(!menuButtonSelected) {
+    if (!menuButtonSelected) {
         menuButton.classList.add('selected')
         menu.style.width = '100%'
         informationDiv.style.display = 'inline-block'
@@ -201,6 +201,12 @@ if ('Notification' in window) {
             }
         })
     }
+
+    if (Notification.permission === 'granted') {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+        }
+    }
 }
 else {
     console.log('Notification is not supported')
@@ -235,13 +241,22 @@ peerConnection.oniceconnectionstatechange = function() {
         if ('Notification' in window) {
             if (Notification.permission === 'granted') {
                 if (document.visibilityState === 'hidden') {
-                    navigator.serviceWorker.register('sw.js')
-                    navigator.serviceWorker.ready.then(function (registration) {
-                        registration.showNotification('Video Chat', {
-                        body: 'Someone joined your room!',
-                        icon: './img/call_received.png',
-                        vibrate: [200, 100, 200, 100, 200, 100, 200],
-                        tag: 'vibration-sample',
+                    navigator.serviceWorker.getRegistration().then(function (registration) {
+                        registration.getNotifications().then(function (notifications) {
+                            //Clear out all prior notifications in order to send new one
+                            if (notifications.length > 0) {
+                                notifications.forEach(function (notification) {
+                                    console.log(notification)
+                                    notification.close()
+                                })
+                            }
+
+                            registration.showNotification('Video Chat', {
+                            body: 'Someone joined your room!',
+                            icon: './img/call_received.png',
+                            vibrate: [200, 100, 200, 100, 200, 100, 200],
+                            tag: 'vibration-sample',
+                            })
                         })
                     })
                 }
