@@ -139,11 +139,11 @@ socket.on('store-view-load', data => {
     userInfo.innerHTML = `User ID: ${data.storeViewUserId}` //`, Socket ID: ${data.socketid}`
 })
 
-socket.on('update-room-list', ({ sockets, rooms }) => {
-    updateRoomList(sockets, rooms)
+socket.on('update-room-list', ({ sockets, rooms, userDetails }) => {
+    updateRoomList(sockets, rooms, userDetails)
 })
 
-function updateRoomList(sockets, rooms) {
+function updateRoomList(sockets, rooms, userDetails) {
     if (sockets.length > 0) {
         deleteEmptyRoomDiv()
     }
@@ -153,13 +153,13 @@ function updateRoomList(sockets, rooms) {
     for (var i = 0; i < sockets.length; i++) {
         const alreadyExistingRoom = document.getElementById(sockets[i])
         if(!alreadyExistingRoom) {
-            const userContainerElement = createRoomItemContainer(sockets[i], rooms[i])
+            const userContainerElement = createRoomItemContainer(sockets[i], rooms[i], userDetails[i])
             activeUserContainer.appendChild(userContainerElement)
         }
     }
 }
 
-function createRoomItemContainer(socketId, roomNumber) {
+function createRoomItemContainer(socketId, roomNumber, userDetail) {
     const userContainerElement = document.createElement('div')
     const userIconElement = document.createElement('i')
     const usernameElement = document.createElement('span')
@@ -169,7 +169,7 @@ function createRoomItemContainer(socketId, roomNumber) {
     userIconElement.setAttribute('class','material-icons phone')
     userIconElement.innerHTML = 'call'
     // usernameElement.setAttribute('class', 'username')
-    usernameElement.innerHTML = ` Room Number: ${roomNumber} (${socketId})`
+    usernameElement.innerHTML = ` Room ${roomNumber}: ${userDetail}`
 
     userContainerElement.append(userIconElement)
     userContainerElement.append(usernameElement)

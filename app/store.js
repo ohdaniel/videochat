@@ -1,5 +1,14 @@
+const userDetail = localStorage.getItem('userDetail')
+if (userDetail) {
+    document.getElementById('user-info').innerHTML = userDetail
+}
+else {
+    window.location.href = new URL('/app/overview.html', window.location.href)
+    throw new Error('Need to input userDetail from overview page')
+}
+
 const roomNumber = Math.floor((Math.random()*9999)+1) //TODO: Ensure duplicates don't cause any issues
-const socket = io({query: "roomNumber=" + roomNumber})
+const socket = io({query: "roomNumber=" + roomNumber + "&userDetail=" + userDetail})
 
 const configuration = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]}
 const {RTCPeerConnection, RTCSessionDescription} = window
@@ -58,7 +67,7 @@ navigator.mediaDevices.enumerateDevices()
         micsAvailable = devices.filter(device => device.kind == 'audioinput')
 
         // //call getUserMedia once to ensure a full list of all video and audio devices
-        // mediaConstraints = { video: camsAvailable.length > 0, audio: micsAvailable.length > 0}
+        // mediaConstraints = { video: camsAvailable.length > 0, audio: micsAvailable.length > 0 }
 
         // console.log('total cameras: ' + camsAvailable.length)
         // camsAvailable.forEach(camera => {
@@ -72,10 +81,10 @@ navigator.mediaDevices.enumerateDevices()
                     facingMode: {
                         exact: cameraMode
                     }
-                }, audio: micsAvailable.length > 0}
+                }, audio: micsAvailable.length > 0 }
         }
         else {
-            mediaConstraints = { video: false, audio: micsAvailable.length > 0}
+            mediaConstraints = { video: false, audio: micsAvailable.length > 0 }
         }
 
         return navigator.mediaDevices.getUserMedia(mediaConstraints)
@@ -86,7 +95,7 @@ navigator.mediaDevices.enumerateDevices()
             console.warn(error)
 
             if (error.name === 'OverconstrainedError') {
-                const mediaConstraints = { video: camsAvailable.length > 0, audio: micsAvailable.length > 0}
+                const mediaConstraints = { video: camsAvailable.length > 0, audio: micsAvailable.length > 0 }
                 navigator.mediaDevices.getUserMedia(mediaConstraints)
                     .then((finalStream) => {
                         initializeMediaDevices(finalStream)
@@ -410,7 +419,7 @@ cameraSwapButton.addEventListener('click', () => {
 
 function changeCamera(cameraDeviceId) {
     if (cameraDeviceId === '') {
-        mediaConstraints = { video: false, audio: micsAvailable.length > 0}
+        mediaConstraints = { video: false, audio: micsAvailable.length > 0 }
     }
     else {
         mediaConstraints = {
