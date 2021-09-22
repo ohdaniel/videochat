@@ -32,9 +32,10 @@ server.listen(port, () => {
 })
 
 let activeSockets = []
-let socketIdRoomNumberMap = new Map()
+let socketIdRoomNumberMap = new Map() //Can probably delete
 let storeSocketIds = []
 let storeRoomNumbers = []
+let storeUserDetails = []
 let socketIdUserIdMap = new Map()
 let storeViewSocketIds = []
 let storeViewUserIds = []
@@ -45,6 +46,7 @@ io.on('connection', (socket) => {
 
 
     const roomNumber = socket.handshake.query['roomNumber']
+    const userDetail = socket.handshake.query['userDetail']
     const storeViewUserId = socket.handshake.query['userId']
 
     socket.on('message', (data) => {
@@ -156,10 +158,12 @@ io.on('connection', (socket) => {
             socketIdRoomNumberMap.set(socket.id, roomNumber)
             storeSocketIds.push(socket.id)
             storeRoomNumbers.push(roomNumber)
+            storeUserDetails.push(userDetail)
 
             socket.broadcast.emit('update-room-list', {
                 sockets: storeSocketIds,
-                rooms: storeRoomNumbers
+                rooms: storeRoomNumbers,
+                userDetails: storeUserDetails
             })
         }
 
@@ -171,10 +175,11 @@ io.on('connection', (socket) => {
             storeViewUserIds.push(storeViewUserId)
         }
 
-        socket.emit('update-room-list', {
-            sockets: storeSocketIds,
-            rooms: storeRoomNumbers
-        })
+        // socket.emit('update-room-list', {
+        //     sockets: storeSocketIds,
+        //     rooms: storeRoomNumbers,
+        //     userDetails: storeUserDetails
+        // })
     }
 
     function clearOutSocketCollections() {
@@ -186,8 +191,14 @@ io.on('connection', (socket) => {
         
         if (isStore) {
             socketIdRoomNumberMap.delete(socket.id)
-            storeSocketIds = storeSocketIds.filter(existingSocket => existingSocket !== socket.id)
-            storeRoomNumbers = storeRoomNumbers.filter(existingSocket => existingSocket !== roomNumber)
+            var storeSocketIdIndex = storeSocketIds.indexOf(socket.id)
+            if (storeSocketIdIndex > -1) {
+                storeSocketIds.splice(storeSocketIdIndex, 1)
+                storeRoomNumbers.splice(storeSocketIdIndex, 1)
+                storeUserDetails.splice(storeSocketIdIndex, 1)
+            }
+            // storeSocketIds = storeSocketIds.filter(existingSocket => existingSocket !== socket.id)
+            // storeRoomNumbers = storeRoomNumbers.filter(existingSocket => existingSocket !== roomNumber)
             socket.broadcast.emit('remove-room', {
                 roomNumber: socket.id
             })
