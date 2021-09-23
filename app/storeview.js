@@ -38,6 +38,12 @@ var mics
 var mediaConstraints
 var cameraSelected = ''
 
+var isAlertOn = false //default false, need user action in order to play audio on mobile
+var iceConnectionSucceededSound = new Audio('./audio/glass_drop_and_roll.mp3')
+iceConnectionSucceededSound.volume = 0.0
+var iceConnectionDisconnectedSound = new Audio('./audio/screen_door_close.mp3')
+iceConnectionDisconnectedSound.volume = 0.0
+
 //Start video and display on own screen
 navigator.mediaDevices.enumerateDevices()
     .then(devices => {
@@ -119,8 +125,9 @@ peerConnection.oniceconnectionstatechange = function() {
         document.getElementById('active-room-container').style.display = 'none'
         socket.emit('connection-succeeded', {})
 
-        // var connectionSucceededSound = new Audio('https://actions.google.com/sounds/v1/doors/wood_door_open.ogg')
-        // connectionSucceededSound.play()
+        if (isAlertOn) {
+            iceConnectionSucceededSound.play()
+        }
     }
     if (iceConnectionState == 'disconnected') {
         //Clear out traces of old connection and setup screen to be able to connect to someone again
@@ -131,6 +138,10 @@ peerConnection.oniceconnectionstatechange = function() {
 
         //Make user available again
         socket.emit('make-socket-available', {})
+
+        if (isAlertOn) {
+            iceConnectionDisconnectedSound.play()
+        }
     }
 }
 
@@ -154,7 +165,13 @@ function updateRoomList(sockets, rooms, userDetails) {
         const alreadyExistingRoom = document.getElementById(sockets[i])
         if(!alreadyExistingRoom) {
             const userContainerElement = createRoomItemContainer(sockets[i], rooms[i], userDetails[i])
-            activeUserContainer.appendChild(userContainerElement)
+
+            //Add new room sorted
+            var activeRoomElements = Array.prototype.slice.call(activeUserContainer.getElementsByTagName('div'))
+            var beforeRoomElement = activeRoomElements.find(function(roomElement) {
+                return roomElement.innerHTML > userContainerElement.innerHTML
+            })
+            activeUserContainer.insertBefore(userContainerElement, beforeRoomElement)
         }
     }
 }
@@ -253,6 +270,25 @@ socket.on('answer-made', async data => {
     if (!isAlreadyCalling) {
         callUser(data.socket)
         isAlreadyCalling = true
+    }
+})
+
+const alertIcon = document.getElementById('alertIcon')
+alertIcon.addEventListener('click', () => {    
+    iceConnectionSucceededSound.play().then(() => iceConnectionSucceededSound.pause())
+    iceConnectionDisconnectedSound.play().then(() => iceConnectionDisconnectedSound.pause())
+
+    isAlertOn = !isAlertOn
+
+    if (isAlertOn) {
+        iceConnectionSucceededSound.volume = 1.0
+        iceConnectionDisconnectedSound.volume = 1.0
+        alertIcon.innerHTML = 'notifications_active'
+    }
+    else {
+        iceConnectionSucceededSound.volume = 0.0
+        iceConnectionDisconnectedSound.volume = 0.0
+        alertIcon.innerHTML = 'notifications_off'
     }
 })
 

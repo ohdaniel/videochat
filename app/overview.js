@@ -12,7 +12,7 @@ var currentRoomNumber = null
 
 let isAlreadyCalling = false
 
-document.title = `Store View User ${userId}`
+document.title = `Overview`
 
 let menuButtonSelected = false
 const menu = document.getElementById('menu')
@@ -33,11 +33,6 @@ menuButton.addEventListener('click', () => {
     }
 })
 
-socket.on('store-view-load', data => {
-    const userInfo = document.getElementById('user-info')
-    userInfo.innerHTML = `User ID: ${data.storeViewUserId}` //`, Socket ID: ${data.socketid}`
-})
-
 socket.on('update-room-list', ({ sockets, rooms, userDetails }) => {
     updateRoomList(sockets, rooms, userDetails)
 })
@@ -53,7 +48,13 @@ function updateRoomList(sockets, rooms, userDetails) {
         const alreadyExistingRoom = document.getElementById(sockets[i])
         if(!alreadyExistingRoom) {
             const userContainerElement = createRoomItemContainer(sockets[i], rooms[i], userDetails[i])
-            activeUserContainer.appendChild(userContainerElement)
+
+            //Add new room sorted
+            var activeRoomElements = Array.prototype.slice.call(activeUserContainer.getElementsByTagName('div'))
+            var beforeRoomElement = activeRoomElements.find(function(roomElement) {
+                return roomElement.innerHTML > userContainerElement.innerHTML
+            })
+            activeUserContainer.insertBefore(userContainerElement, beforeRoomElement)
         }
     }
 }
@@ -114,13 +115,17 @@ storeIcon.addEventListener('click', () => {
     window.location.href = new URL('/app/store.html', window.location.href)
 })
 
-const userInfo = document.getElementById('user-info')
+const userInfo = document.getElementById('store-info')
 userInfo.addEventListener('click', () => {
     document.getElementById('user-detail-container').style.display = 'inline'
 })
 
-document.getElementById('user-info').innerHTML = localStorage.getItem('userDetail')
-document.getElementById('user-detail-input').value = localStorage.getItem('userDetail')
+if (localStorage.getItem('userDetail')) {
+    document.getElementById('user-detail-container').style.display = 'none'
+
+    document.getElementById('store-info').innerHTML = localStorage.getItem('userDetail')
+    document.getElementById('user-detail-input').value = localStorage.getItem('userDetail')
+}
 
 const userDetailButton = document.getElementById('userDetailButton')
 userDetailButton.addEventListener('click', () => {
@@ -128,7 +133,7 @@ userDetailButton.addEventListener('click', () => {
 
     if (inputtedUserDetail) {
         localStorage.setItem('userDetail', inputtedUserDetail)
-        document.getElementById('user-info').innerHTML = inputtedUserDetail
+        document.getElementById('store-info').innerHTML = inputtedUserDetail
         document.getElementById('user-detail-container').style.display = 'none'
     }
 })

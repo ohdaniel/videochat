@@ -271,8 +271,6 @@ peerConnection.oniceconnectionstatechange = function() {
                 }
             }
         }
-        
-        console.log('End of connect success')
     }
     if (iceConnectionState == 'disconnected') {
         //Clear out traces of old connection and setup screen to be able to connect to someone again
@@ -363,6 +361,11 @@ alertIcon.addEventListener('click', () => {
         iceConnectionDisconnectedSound.volume = 0.0
         alertIcon.innerHTML = 'notifications_off'
     }
+})
+
+const userInfo = document.getElementById('user-info')
+userInfo.addEventListener('click', () => {
+    window.location.href = new URL('/app/overview.html', window.location.href)
 })
 
 const callStoreViewUserButton = document.getElementById('callStoreViewUserButton')
