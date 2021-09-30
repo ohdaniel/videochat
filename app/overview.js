@@ -1,5 +1,4 @@
-const userId = Math.floor((Math.random()*9999)+1) //TODO: Ensure duplicates don't cause any issues
-const socket = io({query: "userId=" + userId})
+const socket = io()
 
 const configuration = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]}
 const {RTCPeerConnection, RTCSessionDescription} = window
@@ -31,6 +30,11 @@ menuButton.addEventListener('click', () => {
         informationDiv.style.display = 'none'
         menuButtonSelected = false
     }
+})
+
+socket.on('update-storeviewers-list', ({ sockets }) => {
+    console.log(sockets)
+    document.getElementById('customer-info').innerHTML = ` | # of customers: ${sockets.length}`
 })
 
 socket.on('update-room-list', ({ sockets, rooms, userDetails }) => {
@@ -65,7 +69,7 @@ function createRoomItemContainer(socketId, roomNumber, userDetail) {
 
     userContainerElement.setAttribute('class', 'active-room')
     userContainerElement.setAttribute('id', socketId)
-    usernameElement.innerHTML = ` Room ${roomNumber}: ${userDetail}`
+    usernameElement.innerHTML = `${userDetail} [Room ${roomNumber}]`
 
     userContainerElement.append(usernameElement)
 
@@ -94,7 +98,7 @@ function addEmptyRoomDiv() {
 
     userContainerElement.setAttribute('class', 'active-room')
     userContainerElement.setAttribute('id', 'emptyRoom')
-    userIconElement.setAttribute('class','material-icons md-20')
+    userIconElement.setAttribute('class','material-icons sad-face')
     userIconElement.innerHTML = 'mood_bad'
     usernameElement.innerHTML = ' No one is available, please call for service'
 

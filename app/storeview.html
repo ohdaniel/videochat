@@ -20,8 +20,8 @@
      </div>
      <div class="information" id="information">
        <span>
-         <i class="material-icons md-15" id="alertIcon">notifications_off</i>
-         <i class="material-icons md-15" id="infoIcon">info_outline</i>
+         <i class="material-icons md-15" title='Alert' id="alertIcon">notifications_off</i>
+         <i class="material-icons md-15" title='Survey' id="reviewIcon">star</i>
        </span>
        <span class="talk-info" id="user-info"></span>
      </div>
@@ -34,12 +34,35 @@
         <button class="button buttonDisabled" id="micButton"><i class="material-icons md-20" id="micIcon">mic_off</i></button>
         <button class="button" style="display:none;" id="cameraSwapButton"><i class="material-icons md-20" id="cameraSwapIcon">switch_video</i></button>
         <button class="button" id="swapButton"><i class="material-icons md-20" id="swapIcon">autorenew</i></button>
+        <button class="button buttonEndCall" id="endCallButton"><i class="material-icons md-20" id="endCallIcon">call_end</i></button>
     </div>
    </div>
    <div class="active-room-panel" id="active-room-container">
     <h3 class="panel-room">Active Rooms</h3>
-    <div class="active-room" id="emptyRoom"><i class="material-icons md-20">mood_bad</i><span> No one is available, please call for service</span></div>
+    <div class="active-room" id="emptyRoom"><i class="material-icons sad-face">mood_bad</i><span> No one is available, please call for service</span></div>
    </div>
+   <div class="user-detail-panel" style="display:none;" id="feedback-container">
+    <div class="user-detail-content">
+      How would you rate your experience: 
+      <div class="rate">
+        <input type="radio" id="star5" name="rate" value="5"/>
+        <label for="star5"></label>
+        <input type="radio" id="star4" name="rate" value="4"/>
+        <label for="star4"></label>
+        <input type="radio" id="star3" name="rate" value="3"/>
+        <label for="star3"></label>
+        <input type="radio" id="star2" name="rate" value="2"/>
+        <label for="star2"></label>
+        <input type="radio" id="star1" name="rate" value="1"/>
+        <label for="star1"></label>
+      </div>
+      <br/>
+      <textarea class="feedback-input" type="text" placeholder="Please provide any feedback so we can improve!" id="feedback-input"></textarea>
+      <br/>
+      <button class="sendButton" id="sendFeedbackButton">Send</button>
+      <button class="cancelButton" id="cancelFeedbackButton">Cancel</button>
+   </div>
+  </div>
    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
    <script src="./storeview.js"></script>
  </body>

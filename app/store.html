@@ -20,11 +20,10 @@
      </div>
      <div class="information" id="information">
        <span>
-         <i class="material-icons md-15" id="alertIcon">notifications_off</i>
-         <i class="material-icons md-15" id="notificationIcon">speaker_notes_off</i>
-         <i class="material-icons md-15" id="infoIcon">info_outline</i>
+         <i class="material-icons md-15" title='alert' id="alertIcon">notifications_off</i>
+         <i class="material-icons md-15" title='notification' id="notificationIcon">speaker_notes_off</i>
        </span>
-       <span class="talk-info" id="user-info"></span>
+       <span class="talk-info" title='Change Name' id="user-info"></span>
        <span class="talk-info" id="store-info"></span>
        <div class="cam-options" style="display:none;" id="camOptions">
          Camera: 
@@ -40,11 +39,12 @@
         <button class="button buttonDisabled" id="micButton"><i class="material-icons md-20" id="micIcon">mic_off</i></button>
         <button class="button" style="display:none;" id="cameraSwapButton"><i class="material-icons md-20" id="cameraSwapIcon">switch_video</i></button>
         <button class="button" id="swapButton"><i class="material-icons md-20" id="swapIcon">autorenew</i></button>
+        <button class="button buttonEndCall" id="endCallButton"><i class="material-icons md-20" id="endCallIcon">call_end</i></button>
     </div>
    </div>
    <div class="call-store-view-user-panel" id="call-store-view-user-container">
     <br>Store View User Id: <input class="call-store-view-user-input" type="text" id="store-view-user-id">
-    <button class="button" id="callStoreViewUserButton"><i class="material-icons call" id="callIcon">call</i></button>
+    <button class="callStoreViewUserbutton" id="callStoreViewUserButton"><i class="material-icons call" id="callIcon">call</i></button>
    </div>
    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
    <script src="./store.js"></script>

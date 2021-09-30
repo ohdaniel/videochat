@@ -3,7 +3,8 @@ const socket = io({query: "userId=" + userId})
 
 const configuration = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]}
 const {RTCPeerConnection, RTCSessionDescription} = window
-const peerConnection = new RTCPeerConnection(configuration)
+// var peerConnection = new RTCPeerConnection(configuration)
+var peerConnection = null
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
@@ -60,9 +61,11 @@ navigator.mediaDevices.enumerateDevices()
                 localVideo.srcObject = stream
             }
 
-            stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
+            // stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
 
             myStream = stream
+
+            initializePeerConnection()
 
             var vid = stream.getVideoTracks()[0]
             var vidEnabled = vid && vid.enabled
@@ -94,8 +97,6 @@ navigator.mediaDevices.enumerateDevices()
             .then((devices) => {
                 console.log("isMobile: " + isMobile)
                 console.log("cams.length: " + cams.length)
-                const userInfo = document.getElementById('user-info')
-                userInfo.innerHTML = userInfo.innerHTML + ', Cameras: ' + cams.length
                 //If mobile device with exactly two cameras, have ability to swap between front and back camera
                 if (isMobile && cams.length === 2) {
                     document.getElementById('cameraSwapButton').style.display = 'inline-block'
@@ -105,14 +106,34 @@ navigator.mediaDevices.enumerateDevices()
             console.warn(error)
         })
 
-peerConnection.ontrack = function({ streams: [stream] }) {
+function initializePeerConnection() {
+    peerConnection = new RTCPeerConnection(configuration)
+
+    if (myStream) {
+        myStream.getTracks().forEach(track => peerConnection.addTrack(track, myStream))
+    }
+    peerConnection.ontrack = function({ streams: [stream] }) {
+        peerConnectionOnTrack({ streams: [stream] })
+    }
+
+    peerConnection.oniceconnectionstatechange = function() {
+        peerConnectionOnIceConnectionStateChange()
+    }
+}
+
+function recreatePeerConnection() {
+    peerConnection.close()
+    initializePeerConnection()
+}
+
+function peerConnectionOnTrack({ streams: [stream] }) {
     const remoteVideo = document.getElementById('remote-video')
     if (remoteVideo) {
         remoteVideo.srcObject = stream
     }
 }
 
-peerConnection.oniceconnectionstatechange = function() {
+function peerConnectionOnIceConnectionStateChange() {
     console.log('peerConnection.oniceconnectionstatechange')
     var iceConnectionState = peerConnection.iceConnectionState
     console.log(iceConnectionState)
@@ -128,21 +149,35 @@ peerConnection.oniceconnectionstatechange = function() {
         if (isAlertOn) {
             iceConnectionSucceededSound.play()
         }
+
+        document.getElementById('feedback-container').style.display = 'none'
     }
     if (iceConnectionState == 'disconnected') {
-        //Clear out traces of old connection and setup screen to be able to connect to someone again
-        document.getElementById('remote-video').srcObject = null
-        currentRoomNumber = null
-        document.title = `Store View User ${userId}`
-        document.getElementById('active-room-container').style.display = 'block'
-
-        //Make user available again
-        socket.emit('make-socket-available', {})
+        cleanUpConnection()
 
         if (isAlertOn) {
             iceConnectionDisconnectedSound.play()
         }
     }
+}
+
+function cleanUpConnection() {
+    document.getElementById('remote-video').srcObject = null
+    currentRoomNumber = null
+    document.title = `Store View User ${userId}`
+    document.getElementById('active-room-container').style.display = 'block'
+    isAlreadyCalling = false
+
+    //Make user available again
+    socket.emit('make-socket-available', {})
+
+    if (isAlertOn) {
+        iceConnectionDisconnectedSound.play()
+    }
+
+    document.getElementById('feedback-container').style.display = 'inline'
+
+    recreatePeerConnection()
 }
 
 socket.on('store-view-load', data => {
@@ -178,22 +213,24 @@ function updateRoomList(sockets, rooms, userDetails) {
 
 function createRoomItemContainer(socketId, roomNumber, userDetail) {
     const userContainerElement = document.createElement('div')
+    const callbuttonElement = document.createElement('button')
     const userIconElement = document.createElement('i')
     const usernameElement = document.createElement('span')
 
     userContainerElement.setAttribute('class', 'active-room')
     userContainerElement.setAttribute('id', socketId)
-    userIconElement.setAttribute('class','material-icons phone')
+    callbuttonElement.setAttribute('class','button buttonEnabled')
+    userIconElement.setAttribute('class','material-icons md-20')
     userIconElement.innerHTML = 'call'
-    // usernameElement.setAttribute('class', 'username')
-    usernameElement.innerHTML = ` Room ${roomNumber}: ${userDetail}`
+    usernameElement.innerHTML = ` ${userDetail} [Room ${roomNumber}]`
 
-    userContainerElement.append(userIconElement)
+    callbuttonElement.append(userIconElement)
+    userContainerElement.append(callbuttonElement)
     userContainerElement.append(usernameElement)
 
-    userContainerElement.addEventListener('click', () => {
+    callbuttonElement.addEventListener('click', () => {
         unselectRoomsFromList();
-        userContainerElement.setAttribute('class', 'active-room active-room--selected')
+        // userContainerElement.setAttribute('class', 'active-room active-room--selected')
         currentRoomNumber = roomNumber
         callUser(socketId)
     })
@@ -227,7 +264,7 @@ function addEmptyRoomDiv() {
 
     userContainerElement.setAttribute('class', 'active-room')
     userContainerElement.setAttribute('id', 'emptyRoom')
-    userIconElement.setAttribute('class','material-icons md-20')
+    userIconElement.setAttribute('class','material-icons sad-face')
     userIconElement.innerHTML = 'mood_bad'
     usernameElement.innerHTML = ' No one is available, please call for service'
 
@@ -254,6 +291,7 @@ async function callUser(socketId) {
 }
 
 socket.on('call-made', async data => {
+    console.log('call-made')
     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer))
     const answer = await peerConnection.createAnswer()
     await peerConnection.setLocalDescription(new RTCSessionDescription(answer))
@@ -265,6 +303,7 @@ socket.on('call-made', async data => {
 })
 
 socket.on('answer-made', async data => {
+    console.log('answer-made')
     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer))
 
     if (!isAlreadyCalling) {
@@ -290,6 +329,11 @@ alertIcon.addEventListener('click', () => {
         iceConnectionDisconnectedSound.volume = 0.0
         alertIcon.innerHTML = 'notifications_off'
     }
+})
+
+const reviewIcon = document.getElementById('reviewIcon')
+reviewIcon.addEventListener('click', () => {
+    document.getElementById('feedback-container').style.display = 'inline'
 })
 
 const vidButton = document.getElementById('vidButton')
@@ -368,4 +412,32 @@ swapButton.addEventListener('click', () => {
     var remoteClass = document.getElementById('remote-video').className;
     document.getElementById('local-video').className = remoteClass;
     document.getElementById('remote-video').className = localClass;
+})
+
+const endCallButton = document.getElementById('endCallButton')
+endCallButton.addEventListener('click', () => { 
+    cleanUpConnection()
+})
+
+const sendFeedbackButton = document.getElementById('sendFeedbackButton')
+sendFeedbackButton.addEventListener('click', () => {
+    var subject = 'Video Chat Feedback'
+
+    var ratingInput = document.querySelectorAll('input[name=rate]:checked')[0]
+    var ratingValue = 'N/A'
+    if (ratingInput) {
+        ratingValue = ratingInput.value + '/5'
+    }
+    var feedbackInput = document.getElementById('feedback-input').value
+
+    var feedback = ('Rating: ' + ratingValue + '<br/><br/>Feedback: ' + feedbackInput.replace(/(?:\r\n|\r|\n)/g,'<br/>'))
+
+    socket.emit('email-feedback', {subject, feedback})
+
+    document.getElementById('feedback-container').style.display = 'none'
+})
+
+const cancelFeedbackButton = document.getElementById('cancelFeedbackButton')
+cancelFeedbackButton.addEventListener('click', () => {
+    document.getElementById('feedback-container').style.display = 'none'
 })

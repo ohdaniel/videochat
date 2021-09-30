@@ -4,6 +4,9 @@ const express = require('express')
 const app = express()
 const server = require('http').createServer(app)
 const io = require('socket.io')(server, {cors: {origin: '*'}, allowEIO3: true})
+// const nodeMailer = require('nodemailer')
+// const SMTPTransport = require("nodemailer/lib/smtp-transport")
+const sendmail = require('sendmail')()
 
 app.set('view engine', 'html')
 
@@ -44,13 +47,11 @@ io.on('connection', (socket) => {
     var host = 'localhost';
     // var host = '192.168.86.23';
 
-
     const roomNumber = socket.handshake.query['roomNumber']
     const userDetail = socket.handshake.query['userDetail']
     const storeViewUserId = socket.handshake.query['userId']
 
     socket.on('message', (data) => {
-
         io.emit('message', data)
         console.log('server.js message')
     })
@@ -81,6 +82,8 @@ io.on('connection', (socket) => {
     if (storeViewUserId) {
         isStoreView = true
     }
+
+    var isOverview = !(isStore || isStoreView)
 
     addToSocketCollections()
 
@@ -173,13 +176,23 @@ io.on('connection', (socket) => {
             socketIdUserIdMap.set(socket.id, storeViewUserId)
             storeViewSocketIds.push(socket.id)
             storeViewUserIds.push(storeViewUserId)
+
+            socket.broadcast.emit('update-storeviewers-list', {
+                sockets: storeViewSocketIds
+            })
         }
 
-        // socket.emit('update-room-list', {
-        //     sockets: storeSocketIds,
-        //     rooms: storeRoomNumbers,
-        //     userDetails: storeUserDetails
-        // })
+        if (isStoreView || isOverview) {
+            socket.emit('update-storeviewers-list', {
+                sockets: storeViewSocketIds
+            })
+            
+            socket.emit('update-room-list', {
+                sockets: storeSocketIds,
+                rooms: storeRoomNumbers,
+                userDetails: storeUserDetails
+            })
+        }
     }
 
     function clearOutSocketCollections() {
@@ -208,6 +221,56 @@ io.on('connection', (socket) => {
             socketIdUserIdMap.delete(socket.id)
             storeViewSocketIds = storeViewSocketIds.filter(existingStoreViewSocketId => existingStoreViewSocketId !== socket.id)
             storeViewUserIds = storeViewUserIds.filter(existingStoreViewUserId => existingStoreViewUserId !== storeViewUserId)
+
+            socket.broadcast.emit('update-storeviewers-list', {
+                sockets: storeViewSocketIds
+            })
         }
+    }
+    
+    socket.on('email-feedback', data => {
+        emailFeedback(data.subject, data.feedback)
+    })
+
+    function emailFeedback(emailSubject, emailBody) {
+        // const transporter = nodeMailer.createTransport({
+        //     host: 'localhost',
+        //     port: 465,
+        //     secure: true,
+        //     auth: {}
+        // })
+
+        // const transporter = nodeMailer.createTransport(new SMTPTransport ({
+        //     name: 'localhost',
+        //     host: 'smtp.ethereal.email',
+        //     port: 587,
+        //     auth: {
+        //         user: 'tina.schulist87@ethereal.email',
+        //         pass: 'CDdfUfGcvzpCJyjkGJ'
+        //     }
+        // }))
+    
+        // var mailOptions = {
+        //     // from: 'ohdaniel629@gmail.com',
+        //     to: 'ohdaniel629@gmail.com',
+        //     subject: 'Test email survey',
+        //     text: 'Good job'
+        // }
+    
+        // transporter.sendMail(mailOptions, function(error) {
+        //     if (error) {
+        //         console.log(error)
+        //     }
+        // })
+
+        sendmail({
+            from: 'noreply@mail.com',
+            to: 'ohdaniel629@gmail.com',
+            subject: emailSubject,
+            html: emailBody
+        }, function (error, reply) {
+            console.log(error && error.stack)
+            console.log(reply)
+        })
     }
 })

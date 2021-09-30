@@ -12,7 +12,7 @@ const socket = io({query: "roomNumber=" + roomNumber + "&userDetail=" + userDeta
 
 const configuration = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]}
 const {RTCPeerConnection, RTCSessionDescription} = window
-const peerConnection = new RTCPeerConnection(configuration)
+var peerConnection = null
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 
@@ -110,9 +110,11 @@ function initializeMediaDevices(stream) {
     if (localVideo) {
         localVideo.srcObject = stream
     }
-    stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
+    // stream.getTracks().forEach(track => peerConnection.addTrack(track, stream))
 
     myStream = stream
+
+    initializePeerConnection()
 
     var vid = stream.getVideoTracks()[0]
     var vidEnabled = vid && vid.enabled
@@ -178,8 +180,6 @@ function setupCameraList(devices) {
         cameraOptions.appendChild(camOption)
     })
 
-    const storeInfo = document.getElementById('store-info')
-    storeInfo.innerHTML = storeInfo.innerHTML + ', Cameras: ' + camsAvailable.length
     //If mobile device with exactly two cameras, have ability to swap between front and back camera
     if (isMobile && camsAvailable.length == 2) {
         document.getElementById('cameraSwapButton').style.display = 'inline-block'
@@ -221,14 +221,35 @@ else {
     console.log('Notification is not supported')
 }
 
-peerConnection.ontrack = function({ streams: [stream] }) {
+
+function initializePeerConnection() {
+    peerConnection = new RTCPeerConnection(configuration)
+
+    if (myStream) {
+        myStream.getTracks().forEach(track => peerConnection.addTrack(track, myStream))
+    }
+    peerConnection.ontrack = function({ streams: [stream] }) {
+        peerConnectionOnTrack({ streams: [stream] })
+    }
+
+    peerConnection.oniceconnectionstatechange = function() {
+        peerConnectionOnIceConnectionStateChange()
+    }
+}
+
+function recreatePeerConnection() {
+    peerConnection.close()
+    initializePeerConnection()
+}
+
+function peerConnectionOnTrack({ streams: [stream] }) {
     const remoteVideo = document.getElementById('remote-video')
     if (remoteVideo) {
         remoteVideo.srcObject = stream
     }
 }
 
-peerConnection.oniceconnectionstatechange = function() {
+function peerConnectionOnIceConnectionStateChange() {
     console.log('peerConnection.oniceconnectionstatechange')
     var iceConnectionState = peerConnection.iceConnectionState
     console.log(iceConnectionState)
@@ -273,18 +294,27 @@ peerConnection.oniceconnectionstatechange = function() {
         }
     }
     if (iceConnectionState == 'disconnected') {
-        //Clear out traces of old connection and setup screen to be able to connect to someone again
-        document.getElementById('remote-video').srcObject = null
-        document.getElementById('call-store-view-user-container').style.display = 'block'
-
-        //Make room available again
-        socket.emit('make-socket-available', {})
+        cleanUpConnection()
 
         if (isAlertOn) {
             iceConnectionDisconnectedSound.play()
         }
+
     }
 }
+
+function cleanUpConnection() {
+    //Clear out traces of old connection and setup screen to be able to connect to someone again
+    document.getElementById('remote-video').srcObject = null
+    document.getElementById('call-store-view-user-container').style.display = 'block'
+    isAlreadyCalling = false
+
+    //Make room available again
+    socket.emit('make-socket-available', {})
+
+    recreatePeerConnection()
+}
+
 // console.log(document.querySelector('meta[name="viewport"]').content)
 // function zoomOutMobile() {
 //     var viewport = document.querySelector('meta[name="viewport"]')
@@ -299,7 +329,7 @@ peerConnection.oniceconnectionstatechange = function() {
 
 socket.on('store-load', data => {
     const userInfo = document.getElementById('store-info')
-    userInfo.innerHTML = `Room Number: ${data.roomNumber}` //`Room Number: ${data.roomNumber}, Socket ID: ${data.socketid}`
+    userInfo.innerHTML = `| Room Number: ${data.roomNumber}` //`Room Number: ${data.roomNumber}, Socket ID: ${data.socketid}`
 })
 
 async function callStoreViewUser(storeViewUserId) {
@@ -463,4 +493,9 @@ swapButton.addEventListener('click', () => {
     var remoteClass = document.getElementById('remote-video').className;
     document.getElementById('local-video').className = remoteClass;
     document.getElementById('remote-video').className = localClass;
+})
+
+const endCallButton = document.getElementById('endCallButton')
+endCallButton.addEventListener('click', () => { 
+    cleanUpConnection()
 })

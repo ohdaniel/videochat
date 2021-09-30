@@ -93,7 +93,7 @@ body {
     transform: translateY(7px);
   }
 
-  /* menue selected animation */
+  /* menu selected animation */
 
   .menu-button.selected .menu-button-burger {
     transform: translateX(-21.5px);
@@ -237,11 +237,11 @@ body {
     padding: 10px 30px;
     font-size: 18px;
     border-bottom: 1px solid #cddfe7;
-    cursor: pointer;
+    /* cursor: pointer; */
     user-select: none;
   }
 
-  .active-room::before {
+  /* .active-room::before {
     content: '';
     display: block;
     height: 5px;
@@ -252,7 +252,7 @@ body {
 
   .active-room:active::before {
     width: 100%;
-  }
+  } */
   
   .active-room:hover {
     background-color: #e8e9eb;
@@ -315,6 +315,55 @@ body {
     width: 80%;
   }
 
+  .feedback-input {
+    width: 75%;
+    height: 200px;
+    white-space: normal;
+    top: 500px;
+  }
+
+  /* Feedback rating animation  */
+  .rate {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    direction: rtl;
+    /* float: left; */
+  }
+  
+  .rate:not(:checked) > input {
+      position: absolute;
+      top: -9999999px; /* hide radio buttons */
+  }
+  
+  .rate:not(:checked) > label {
+      /* float: right; */
+      width: 1em;
+      overflow: hidden; /* hide non star values */
+      white-space: nowrap;
+      cursor: pointer;
+      font-size: 30px;
+      color: rgb(204,204,204);
+  }
+  
+  .rate:not(:checked) > label:before {
+      content: '★ ';
+  }
+  .rate > input:checked ~ label {
+      color: rgb(255,200,0);    
+  }
+  .rate:not(:checked) > label:hover,
+  .rate:not(:checked) > label:hover ~ label {
+      color: rgb(220,180,25);  
+  }
+  .rate > input:checked + label:hover,
+  .rate > input:checked + label:hover ~ label,
+  .rate > input:checked ~ label:hover,
+  .rate > input:checked ~ label:hover ~ label,
+  .rate > label:hover ~ input:checked ~ label {
+      color: rgb(200,150,0);
+  }
+
   .buttons {
     position: fixed;
     bottom: 0px;
@@ -325,38 +374,80 @@ body {
   }
 
   .button {
-    border-radius: 8px;
-    background-color: white;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: rgb(169, 169, 169);
   }
   
   .buttonEnabled {
-    background-color: green;
+    background-color: rgb(0, 255, 0);
   }
 
   .buttonDisabled {
     background-color: red;
   }
 
+  .buttonEndCall {
+    background-color: red;
+  }
+
+  .callStoreViewUserbutton {
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: rgb(15, 220, 85);
+  }
+
+  .sendButton {
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 5px 15px;
+    color: white;
+    background-color: rgb(15, 220, 85);
+  }
+
+  .cancelButton {
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 5px 15px;
+    color: white;
+    background-color: red;
+  }
+
+  .material-icons {
+    cursor: pointer;
+    color: white;
+  }
+
   .material-icons.phone {
     font-size: 19px;
-    color: green;
-    font-weight: 600;
+    font-weight: 400;
   }
 
   .material-icons.call {
     font-size: 15px;
-    color: green;
-    font-weight: 600;
+    font-weight: 400;
+  }
+
+  .material-icons.sad-face {
+    font-size: 25px;
+    font-weight: 400;
+    cursor: default;
+    color: black;
   }
 
   .material-icons.md-15 {
     font-size: 15px;
+    font-weight: 400;
     color: black;
-    font-weight: 800;
   }
 
   .material-icons.md-20 {
     font-size: 20px;
-    color: black;
-    font-weight: 800;
+    font-weight: 400;
   }
