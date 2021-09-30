@@ -430,9 +430,11 @@ sendFeedbackButton.addEventListener('click', () => {
     }
     var feedbackInput = document.getElementById('feedback-input').value
 
-    var feedback = ('Rating: ' + ratingValue + '<br/><br/>Feedback: ' + feedbackInput.replace(/(?:\r\n|\r|\n)/g,'<br/>'))
+    if (ratingValue != 'N/A' || feedbackInput) {
+        var feedback = ('Rating: ' + ratingValue + '<br/><br/>Feedback: ' + feedbackInput.replace(/(?:\r\n|\r|\n)/g,'<br/>'))
 
-    socket.emit('email-feedback', {subject, feedback})
+        socket.emit('email-feedback', {subject, feedback})
+    }
 
     document.getElementById('feedback-container').style.opacity = 0
 })
