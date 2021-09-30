@@ -150,7 +150,7 @@ function peerConnectionOnIceConnectionStateChange() {
             iceConnectionSucceededSound.play()
         }
 
-        document.getElementById('feedback-container').style.display = 'none'
+        document.getElementById('feedback-container').style.opacity = 0
     }
     if (iceConnectionState == 'disconnected') {
         cleanUpConnection()
@@ -175,7 +175,7 @@ function cleanUpConnection() {
         iceConnectionDisconnectedSound.play()
     }
 
-    document.getElementById('feedback-container').style.display = 'inline'
+    document.getElementById('feedback-container').style.opacity = 1
 
     recreatePeerConnection()
 }
@@ -333,7 +333,7 @@ alertIcon.addEventListener('click', () => {
 
 const reviewIcon = document.getElementById('reviewIcon')
 reviewIcon.addEventListener('click', () => {
-    document.getElementById('feedback-container').style.display = 'inline'
+    document.getElementById('feedback-container').style.opacity = 1
 })
 
 const vidButton = document.getElementById('vidButton')
@@ -434,10 +434,10 @@ sendFeedbackButton.addEventListener('click', () => {
 
     socket.emit('email-feedback', {subject, feedback})
 
-    document.getElementById('feedback-container').style.display = 'none'
+    document.getElementById('feedback-container').style.opacity = 0
 })
 
 const cancelFeedbackButton = document.getElementById('cancelFeedbackButton')
 cancelFeedbackButton.addEventListener('click', () => {
-    document.getElementById('feedback-container').style.display = 'none'
+    document.getElementById('feedback-container').style.opacity = 0
 })
