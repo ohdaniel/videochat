@@ -433,10 +433,12 @@ sendFeedbackButton.addEventListener('click', () => {
     }
     var feedbackInput = document.getElementById('feedback-input').value
 
-    if (ratingValue != 'N/A' || feedbackInput) {
+    if (ratingInput || feedbackInput) {
         var feedback = ('Rating: ' + ratingValue + '<br/><br/>Feedback: ' + feedbackInput.replace(/(?:\r\n|\r|\n)/g,'<br/>'))
 
         socket.emit('email-feedback', {subject, feedback})
+
+        console.log('email request sent!')
     }
 
     // document.getElementById('feedback-container').style.opacity = 0
