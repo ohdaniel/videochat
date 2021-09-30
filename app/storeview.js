@@ -150,7 +150,8 @@ function peerConnectionOnIceConnectionStateChange() {
             iceConnectionSucceededSound.play()
         }
 
-        document.getElementById('feedback-container').style.opacity = 0
+        // document.getElementById('feedback-container').style.opacity = 0
+        document.getElementById('feedback-container').style.display = 'none'
     }
     if (iceConnectionState == 'disconnected') {
         cleanUpConnection()
@@ -175,7 +176,8 @@ function cleanUpConnection() {
         iceConnectionDisconnectedSound.play()
     }
 
-    document.getElementById('feedback-container').style.opacity = 1
+    // document.getElementById('feedback-container').style.opacity = 1
+    document.getElementById('feedback-container').style.display = 'inline-block'
 
     recreatePeerConnection()
 }
@@ -333,7 +335,8 @@ alertIcon.addEventListener('click', () => {
 
 const reviewIcon = document.getElementById('reviewIcon')
 reviewIcon.addEventListener('click', () => {
-    document.getElementById('feedback-container').style.opacity = 1
+    // document.getElementById('feedback-container').style.opacity = 1
+    document.getElementById('feedback-container').style.display = 'inline-block'
 })
 
 const vidButton = document.getElementById('vidButton')
@@ -436,10 +439,12 @@ sendFeedbackButton.addEventListener('click', () => {
         socket.emit('email-feedback', {subject, feedback})
     }
 
-    document.getElementById('feedback-container').style.opacity = 0
+    // document.getElementById('feedback-container').style.opacity = 0
+    document.getElementById('feedback-container').style.display = 'none'
 })
 
 const cancelFeedbackButton = document.getElementById('cancelFeedbackButton')
 cancelFeedbackButton.addEventListener('click', () => {
-    document.getElementById('feedback-container').style.opacity = 0
+    // document.getElementById('feedback-container').style.opacity = 0
+    document.getElementById('feedback-container').style.display = 'none'
 })
