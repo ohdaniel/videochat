@@ -225,6 +225,9 @@ io.on('connection', (socket) => {
             socket.broadcast.emit('update-storeviewers-list', {
                 sockets: storeViewSocketIds
             })
+
+            //Send an email right now to keep track of number of storeviewusers and stores open
+            emailFeedback('Storeview User Connected', '# of customers: ' + storeViewSocketIds.length + ' # of store rooms available: ' + storeSocketIds.length)
         }
     }
     
