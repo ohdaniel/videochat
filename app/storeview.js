@@ -96,7 +96,10 @@ navigator.mediaDevices.enumerateDevices()
             return navigator.mediaDevices.enumerateDevices()
             .then((devices) => {
                 console.log("isMobile: " + isMobile)
-                console.log("cams.length: " + cams.length)
+                console.log("initial cams.length: " + cams.length)
+                console.log("devices.length: " + devices.length)
+                cams = devices.filter(device => device.kind == 'videoinput')
+                console.log("new cams.length: " + cams.length)
                 //If mobile device with exactly two cameras, have ability to swap between front and back camera
                 if (isMobile && cams.length === 2) {
                     document.getElementById('cameraSwapButton').style.display = 'inline-block'
