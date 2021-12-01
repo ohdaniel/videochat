@@ -10,7 +10,7 @@ else {
 const roomNumber = Math.floor((Math.random()*9999)+1) //TODO: Ensure duplicates don't cause any issues
 const socket = io({query: "roomNumber=" + roomNumber + "&userDetail=" + userDetail})
 
-const configuration = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}]}
+const configuration = {iceServers: [{urls: 'stun:stun.l.google.com:19302'}, {urls: 'stun:stun1.l.google.com:19302'}, {url: 'turn:numb.viagenie.ca', username: 'webrtc@live.com', credential: 'muazkh'}]}
 const {RTCPeerConnection, RTCSessionDescription} = window
 var peerConnection = null
 
